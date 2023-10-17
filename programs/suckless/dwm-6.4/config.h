@@ -60,6 +60,7 @@ static const Layout layouts[] = {
 /* commands */
 static const char *dmenucmd[] = { "dmenu_run", "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
 static const char *termcmd[]  = { "alacritty", NULL };
+static const char *printscr[] = { "flameshot", "gui", NULL };
 
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
@@ -78,6 +79,7 @@ static const Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = 0 } }, // always monitor 0
 	{ MODKEY,                       XK_period, focusmon,       {.i = 1 } }, // always monitor 1
 	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = 1 } }, // always monitor 1
+  { MODKEY|ShiftMask,             XK_s,     spawn,           {.v = printscr }},
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)

@@ -826,6 +826,8 @@
     "space_bio_sludge_loop",
     "ground_runway",
     "tesla_gun",
-    "space_insight"
+    "space_insight",
+    "space_mat_impact_data_scrap",
+    "weapon_delivery"
   ]
 }
