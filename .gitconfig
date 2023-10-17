@@ -8,3 +8,6 @@
 	helper = !/usr/bin/gh auth git-credential
 [init]
 	defaultBranch = main
+[user]
+	name = nathan-hello
+	email = natey3k@gmail.com
