@@ -150,6 +150,7 @@ vim.keymap.set("n", "<leader>Y", [["+Y]])                                       
 vim.keymap.set({ "n", "v" }, "<leader>d", [["_d]])                                          -- Delete text without adding deletion to unnamed buffer
 vim.keymap.set("i", "<C-c>", "<Esc>")                                                       -- Esc alternative. Useful for multi-line apparently
 vim.keymap.set("n", "Q", "<nop>")                                                           -- Disable Q.
+vim.keymap.set("n", "H", "<nop>")                                                           -- Disable H. Used for LSP hover. If no LSP exists, then it's annoying.
 vim.keymap.set("n", "<leader>f", vim.lsp.buf.format)                                        -- Format file
 vim.keymap.set("n", "<C-k>", "<cmd>cnext<CR>zz")                                            -- Next entry in quickfix list
 vim.keymap.set("n", "<C-j>", "<cmd>cprev<CR>zz")                                            -- Previous entry in quickfix list
@@ -157,3 +158,4 @@ vim.keymap.set("n", "<leader>k", "<cmd>lnext<CR>zz")                            
 vim.keymap.set("n", "<leader>j", "<cmd>lprev<CR>zz")                                        -- Previous entry in location list
 vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])    -- Find and replace all instances of word that the cursor is currently hovering over
 vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true })                 -- Make current file executable
+vim.keymap.set("n", "<leader>mi", "<cmd>Mason<CR>")                                         -- Install new LSP. Open LSP menu.
