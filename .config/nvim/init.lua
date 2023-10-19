@@ -28,6 +28,8 @@ require("lazy").setup({
     { 'hrsh7th/cmp-nvim-lsp' },                                                            -- https://github.com/VonHeikemen/lsp-zero.nvim
     { 'hrsh7th/nvim-cmp' },                                                                -- https://github.com/VonHeikemen/lsp-zero.nvim
     { 'L3MON4D3/LuaSnip' },                                                                -- https://github.com/VonHeikemen/lsp-zero.nvim
+    { 'goolord/alpha-nvim',
+    config = function () require'alpha'.setup(require'alpha.themes.dashboard'.config) end },
 })
 
 require("nvim-tree").setup({
@@ -36,7 +38,7 @@ require("nvim-tree").setup({
 
 require 'nvim-treesitter.configs'.setup {
     ensure_installed = { "c", "lua", "vim", "vimdoc", "query" },                            -- Install these.
-    ignore_install = { "javascript" },                                                      -- List of parsers to ignore installing (or "all")
+    ignore_install = { "javascript" },                                                      -- Don't install these.
     sync_install = false,                                                                   -- Install parsers synchronously (only applied to `ensure_installed`)
     auto_install = true,                                                                    -- Automatically install missing parsers when entering buffer
 
@@ -103,8 +105,21 @@ cmp.setup({
 })
 
 vim.cmd.colorscheme "catppuccin-mocha"
+
+-- Define a function to check the startup conditions
+_G.check_alpha_conditions = function()    
+    local args = vim.fn.argv()
+    -- Check if Neovim was opened with a directory or with a bare "nvim" command
+    if #args == 0 or ( #args == 1 and vim.fn.isdirectory(args[1]) == 1 ) then
+        -- Open alpha-nvim if the conditions are met
+        vim.cmd('Alpha')
+    end
+end
+
 vim.cmd [[ autocmd VimEnter * NvimTreeOpen ]]                                               -- Open NvimTree on start
-vim.cmd [[ autocmd VimEnter * wincmd h ]]                                                   -- Start cursor at file at start
+vim.cmd [[ autocmd VimEnter * wincmd h ]]                                                   -- Start cursor at Alpha at start
+vim.cmd [[ autocmd VimEnter * lua check_alpha_conditions() ]]                               -- Run the check_alpha_conditions function on startup
+
 vim.g.loaded_netrw = 1                                                                      -- Disable netrw for NvimTree
 vim.g.loaded_netrwPlugin = 1                                                                -- Disable netrw for NvimTree
 vim.cmd [[
