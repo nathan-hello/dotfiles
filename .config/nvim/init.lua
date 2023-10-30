@@ -1,4 +1,5 @@
 vim.g.mapleader = " "
+package.path = package.path .. ';/home/nate/.config/nvim/?.lua'
 
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
@@ -10,13 +11,12 @@ if not vim.loop.fs_stat(lazypath) then
         "--branch=stable", -- latest stable release
         lazypath,
     })
-end
-vim.opt.rtp:prepend(lazypath)
+end vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
     { "nvim-telescope/telescope.nvim",    dependencies = { "nvim-lua/plenary.nvim" } },    -- https://github.com/nvim-telescope/telescope.nvim
     { "catppuccin/nvim", name = "catppuccin-mocha", priority = 1000 },                     -- https://github.com/catppuccin/nvim
-    { "nvim-treesitter/nvim-treesitter",  cmd = "TSUpdate" },                              -- https://github.com/nvim-treesitter/nvim-treesitter
+    { "tvim-treesitter/nvim-treesitter",  cmd = "TSUpdate" },                              -- https://github.com/nvim-treesitter/nvim-treesitter
     { "kdheepak/lazygit.nvim", dependencies = { "nvim-lua/plenary.nvim" }, },              -- https://github.com/kdheepak/lazygit.nvim
     { "kyazdani42/nvim-tree.lua", },                                                       -- https://github.com/nvim-tree/nvim-tree.lua
     { "kassio/neoterm"},                                                                   -- https://github.com/kassio/neoterm
@@ -28,9 +28,23 @@ require("lazy").setup({
     { 'hrsh7th/cmp-nvim-lsp' },                                                            -- https://github.com/VonHeikemen/lsp-zero.nvim
     { 'hrsh7th/nvim-cmp' },                                                                -- https://github.com/VonHeikemen/lsp-zero.nvim
     { 'L3MON4D3/LuaSnip' },                                                                -- https://github.com/VonHeikemen/lsp-zero.nvim
-    { 'goolord/alpha-nvim',
-    config = function () require'alpha'.setup(require'alpha.themes.dashboard'.config) end },
+    { "nvim-lua/plenary.nvim" },
+    { "nvim-telescope/telescope-file-browser.nvim",dependencies = {
+          "nvim-telescope/telescope.nvim",
+          "nvim-lua/plenary.nvim"}
+    },
+    { "christoomey/vim-tmux-navigator" }
+
 })
+
+--    i have accepted defeat
+--    { 'goolord/alpha-nvim', config = function ()
+--	    require'telescope'.load_extension('project')
+--	    require'alpha'.setup(require'dashboard'.config)
+--    end,
+--    event = "VimEnter", dependencies = { "nvim-lua/plenary.nvim" }
+--    } ,
+--    vim.cmd [[ autocmd VimEnter * Alpha ]]
 
 require("nvim-tree").setup({
     view = { side = "right" }
@@ -105,20 +119,10 @@ cmp.setup({
 })
 
 vim.cmd.colorscheme "catppuccin-mocha"
+-- vim.cmd[[ autocmd VimEnter * NvimTreeOpen ]]
+--vim.cmd [[ autocmd VimEnter * wincmd h ]]                                                   -- Start cursor at Alpha at start
 
--- Define a function to check the startup conditions
-_G.check_alpha_conditions = function()    
-    local args = vim.fn.argv()
-    -- Check if Neovim was opened with a directory or with a bare "nvim" command
-    if #args == 0 or ( #args == 1 and vim.fn.isdirectory(args[1]) == 1 ) then
-        -- Open alpha-nvim if the conditions are met
-        vim.cmd('Alpha')
-    end
-end
 
-vim.cmd [[ autocmd VimEnter * NvimTreeOpen ]]                                               -- Open NvimTree on start
-vim.cmd [[ autocmd VimEnter * wincmd h ]]                                                   -- Start cursor at Alpha at start
-vim.cmd [[ autocmd VimEnter * lua check_alpha_conditions() ]]                               -- Run the check_alpha_conditions function on startup
 
 vim.g.loaded_netrw = 1                                                                      -- Disable netrw for NvimTree
 vim.g.loaded_netrwPlugin = 1                                                                -- Disable netrw for NvimTree
@@ -129,7 +133,7 @@ au InsertLeave * set relativenumber
 
 vim.api.nvim_set_keymap('n', '<leader>l', [[<Cmd>NvimTreeFocus<CR>]], {})                   -- Focus NvimTree
 vim.api.nvim_set_keymap('n', '<leader>h', [[<Cmd>wincmd h<CR>]], {})                        -- Focus file
-vim.api.nvim_set_keymap('n', '<leader>cl', [[<Cmd>NvimTreeClose<CR>]], {})                  -- Close NvimTree
+vim.api.nvim_set_keymap('n', '<leader>xl', [[<Cmd>NvimTreeClose<CR>]], {})                  -- Close NvimTree
 -- vim.o.clipboard = "unnamedplus"                                                          -- Make clipboard work (disabled - there's <leader>p and <leader>y later for system clipboard access)
 vim.opt.termguicolors = true                                                                -- Set termguicolors to enable highlight groups
 vim.opt.guifont = "Hasklug Nerd Font Complete"                                              -- Set font
