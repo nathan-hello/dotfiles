@@ -28,14 +28,22 @@ require("lazy").setup({
     { 'hrsh7th/cmp-nvim-lsp' },                                                            -- https://github.com/VonHeikemen/lsp-zero.nvim
     { 'hrsh7th/nvim-cmp' },                                                                -- https://github.com/VonHeikemen/lsp-zero.nvim
     { 'L3MON4D3/LuaSnip' },                                                                -- https://github.com/VonHeikemen/lsp-zero.nvim
+    { 'voldikss/vim-floaterm' },
     { "nvim-lua/plenary.nvim" },
     { "nvim-telescope/telescope-file-browser.nvim",dependencies = {
           "nvim-telescope/telescope.nvim",
           "nvim-lua/plenary.nvim"}
     },
-    { "christoomey/vim-tmux-navigator" }
+    { "christoomey/vim-tmux-navigator" },
+    { "folke/which-key.nvim",
+        init = function() vim.o.timeout = true vim.o.timeoutlen = 999999 end,opts = {}
+    },
+    { 'nvim-lualine/lualine.nvim', dependencies = { 'nvim-tree/nvim-web-devicons' } },
 
 })
+
+vim.cmd.colorscheme "catppuccin-mocha"
+require('lualine').setup()
 
 --    i have accepted defeat
 --    { 'goolord/alpha-nvim', config = function ()
@@ -45,7 +53,35 @@ require("lazy").setup({
 --    event = "VimEnter", dependencies = { "nvim-lua/plenary.nvim" }
 --    } ,
 --    vim.cmd [[ autocmd VimEnter * Alpha ]]
+--
+-- floaterm configuration
+vim.g.floaterm_keymap_toggle = '<F7>'
+vim.g.floaterm_keymap_next = '<F8>'
+vim.g.floaterm_keymap_prev = '<F9>'
+vim.g.floaterm_keymap_new = '<F10>'
+vim.g.floaterm_title = ''
+vim.g.floaterm_width = 0.9
+vim.g.floaterm_height = 0.8
+vim.g.floaterm_opacity = 0.9
+vim.g.floaterm_autohide = 1
 
+-- Function to open specific terminals
+local function open_specific_terminal(index)
+    vim.cmd(string.format("FloatermNew --name=term%d --autoclose=0", index))
+end
+
+-- Keybindings
+vim.api.nvim_set_keymap('n', '<leader>ft', ':FloatermToggle<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>fn', ':FloatermNew<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>f1', '<cmd>lua open_specific_terminal(1)<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>f2', '<cmd>lua open_specific_terminal(2)<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>f3', '<cmd>lua open_specific_terminal(3)<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>fc', ':FloatermKill<CR>', { noremap = true, silent = true })
+vim.keymap.set('t', '<Esc>', '<C-\\><C-n>')
+vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n><cmd>FloatermHide<CR>')
+
+-- lazygit setup
+vim.api.nvim_set_keymap('n', '<leader>lg', ':FloatermNew lazygit<CR>', { noremap = true, silent = true }) 
 require("nvim-tree").setup({
     view = { side = "right" }
 })
@@ -63,10 +99,6 @@ require 'nvim-treesitter.configs'.setup {
 }
 
 local telescope = require('telescope.builtin')
-vim.keymap.set('n', '<leader>ff', telescope.find_files, {})                                 -- Open telescope
-vim.keymap.set('n', '<leader>fg', telescope.live_grep, {})                                  -- Grep entire working dir
-vim.keymap.set('n', '<leader>fb', telescope.buffers, {})                                    -- Open buffers
-vim.keymap.set('n', '<leader>fh', telescope.help_tags, {})                                  -- Search :help
 
 local lsp_zero = require("lsp-zero")
 lsp_zero.on_attach(function(client, bufnr)
@@ -118,11 +150,6 @@ cmp.setup({
     }),
 })
 
-vim.cmd.colorscheme "catppuccin-mocha"
--- vim.cmd[[ autocmd VimEnter * NvimTreeOpen ]]
---vim.cmd [[ autocmd VimEnter * wincmd h ]]                                                   -- Start cursor at Alpha at start
-
-
 
 vim.g.loaded_netrw = 1                                                                      -- Disable netrw for NvimTree
 vim.g.loaded_netrwPlugin = 1                                                                -- Disable netrw for NvimTree
@@ -131,10 +158,7 @@ au InsertEnter * set norelativenumber
 au InsertLeave * set relativenumber
 ]]                                                                                          -- Aboslute line in insert, relative in else
 
-vim.api.nvim_set_keymap('n', '<leader>l', [[<Cmd>NvimTreeFocus<CR>]], {})                   -- Focus NvimTree
-vim.api.nvim_set_keymap('n', '<leader>h', [[<Cmd>wincmd h<CR>]], {})                        -- Focus file
-vim.api.nvim_set_keymap('n', '<leader>xl', [[<Cmd>NvimTreeClose<CR>]], {})                  -- Close NvimTree
--- vim.o.clipboard = "unnamedplus"                                                          -- Make clipboard work (disabled - there's <leader>p and <leader>y later for system clipboard access)
+
 vim.opt.termguicolors = true                                                                -- Set termguicolors to enable highlight groups
 vim.opt.guifont = "Hasklug Nerd Font Complete"                                              -- Set font
 vim.opt.guicursor = ""                                                                      -- Empty string disables special GUI-based cursor styling.
@@ -156,8 +180,22 @@ vim.opt.scrolloff = 8                                                           
 vim.opt.signcolumn = "yes"                                                                  -- Always show the sign column.
 vim.opt.updatetime = 50                                                                     -- Sets the time (in ms) that triggers CursorHold event.
 
+vim.keymap.set('n', '<leader>ff', telescope.find_files, {})                                 -- Open telescope
+vim.keymap.set('n', '<leader>fg', telescope.live_grep, {})                                  -- Grep entire working dir
+vim.keymap.set('n', '<leader>fb', telescope.buffers, {})                                    -- Open buffers
+vim.keymap.set('n', '<leader>fh', telescope.help_tags, {})                                  -- Search :help
+
+vim.keymap.set('n', '<leader>1', '<cmd>1wincmd w<CR>')                                      -- Open window 1 
+vim.keymap.set('n', '<leader>2', '<cmd>2wincmd w<CR>')                                      -- Open window 2
+vim.keymap.set('n', '<leader>3', '<cmd>3wincmd w<CR>')                                      -- Open window 3
+vim.keymap.set('n', '<leader>4', '<cmd>4wincmd w<CR>')                                      -- Open window 4
+vim.keymap.set('n', '<leader>0', [[<Cmd>NvimTreeFocus<CR>]])                                -- Focus NvimTree
+vim.keymap.set('n', '<leader>)', [[<Cmd>NvimTreeClose<CR>]])                                -- Close NvimTree
+
+vim.keymap.set("n", "Q", "<nop>")                                                           -- Disable Q.
+vim.keymap.set("n", "H", "<nop>")                                                           -- Disable H. Used for LSP hover. If no LSP exists, then it's annoying.
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")                                                -- Move selection up
-vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")                                                -- Move line down
+vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")                                                -- Move selection down
 vim.keymap.set("n", "J", "mzJ`z")                                                           -- When Jing, keep cursor at start
 vim.keymap.set("n", "<C-d>", "<C-d>zz")                                                     -- Keep cursor in middle when going up
 vim.keymap.set("n", "<C-u>", "<C-u>zz")                                                     -- Keep cursor in middle when going down
@@ -167,14 +205,11 @@ vim.keymap.set("x", "<leader>p", [["_dP]])                                      
 vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]])                                          -- System clipboard yank
 vim.keymap.set("n", "<leader>Y", [["+Y]])                                                   -- System clipboard yank current line
 vim.keymap.set({ "n", "v" }, "<leader>d", [["_d]])                                          -- Delete text without adding deletion to unnamed buffer
-vim.keymap.set("i", "<C-c>", "<Esc>")                                                       -- Esc alternative. Useful for multi-line apparently
-vim.keymap.set("n", "Q", "<nop>")                                                           -- Disable Q.
-vim.keymap.set("n", "H", "<nop>")                                                           -- Disable H. Used for LSP hover. If no LSP exists, then it's annoying.
 vim.keymap.set("n", "<leader>f", vim.lsp.buf.format)                                        -- Format file
+vim.keymap.set("i", "<C-c>", "<Esc>")                                                       -- Esc alternative. Useful for multi-line apparently
 vim.keymap.set("n", "<C-k>", "<cmd>cnext<CR>zz")                                            -- Next entry in quickfix list
 vim.keymap.set("n", "<C-j>", "<cmd>cprev<CR>zz")                                            -- Previous entry in quickfix list
 vim.keymap.set("n", "<leader>k", "<cmd>lnext<CR>zz")                                        -- Next entry in location list
 vim.keymap.set("n", "<leader>j", "<cmd>lprev<CR>zz")                                        -- Previous entry in location list
 vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])    -- Find and replace all instances of word that the cursor is currently hovering over
-vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true })                 -- Make current file executable
-vim.keymap.set("n", "<leader>mi", "<cmd>Mason<CR>")                                         -- Install new LSP. Open LSP menu.
+vim.keymap.set("n", "<leader><leader>", "<cmd>WhichKey<CR>")                                -- Next entry in location list
