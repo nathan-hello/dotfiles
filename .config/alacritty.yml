@@ -22,10 +22,11 @@ scrolling:
 font:
   size: 16
   normal:
-    family: SFMono Nerd Font
+    # family: SFMono Nerd Font
+    family: Geist Mono
 
  
-  size: 14.0 # Point size of the font
+  size: 16.0 # Point size of the font
 
   offset:
     x: 0 # Offset is the extra space around each character. offset.y can be thought of
