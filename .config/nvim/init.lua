@@ -28,10 +28,13 @@ require("lazy").setup({
     { "saadparwaiz1/cmp_luasnip" },
     { "folke/neodev.nvim" },
     { "L3MON4D3/LuaSnip" },
+    { "RRethy/vim-illuminate" },
+    { "maxmellon/vim-jsx-pretty" },
+    { "wuelnerdotexe/vim-astro"},
 })
 
-vim.g.mapleader = " "
-vim.cmd.colorscheme "catppuccin-mocha"
+vim.g.mapleader = " "                                     -- Space!
+vim.cmd.colorscheme "catppuccin-mocha"                    -- https://github.com/catppuccin/nvim
 vim.g.loaded_netrw = 1                                    -- Disable netrw for NvimTree
 require("nvim-tree").setup({ view = { side = "right" } }) -- Nvim Tree
 local telescope = require("telescope.builtin")            -- Telescope for keybinds later
@@ -45,7 +48,7 @@ local function lsp_status()                               -- Get name of LSP
     end
 end
 
-require("lualine").setup({ -- Lualine
+require("lualine").setup({
     sections = {
         lualine_a = { 'mode' },
         lualine_b = { 'branch', 'diff', 'diagnostics' },
@@ -57,8 +60,7 @@ require("lualine").setup({ -- Lualine
 })
 
 vim.opt.termguicolors = true                                                                    -- Set termguicolors to enable highlight groups
-vim.opt.guicursor =
-""                                                                                              -- Empty string disables special GUI-based cursor styling.
+vim.opt.guicursor = ""                                                                          -- Empty string disables special GUI-based cursor styling.
 vim.opt.nu = true                                                                               -- Enables line numbering.
 vim.opt.tabstop = 4                                                                             -- Sets the number of spaces for a tab character.
 vim.opt.softtabstop = 4                                                                         -- Number of spaces to use for auto-indenting.
@@ -116,14 +118,18 @@ vim.keymap.set("n", "<leader>j", "<cmd>lprev<CR>zz")                            
 vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])        -- Find and replace all instances of word that the cursor is currently hovering over
 vim.keymap.set("n", "<leader><leader>", "<cmd>WhichKey<CR>")                                    -- Next entry in location list
 
--- require("neodev").setup({})                                                                     -- LSP integration specifically for using lua to configure nvim
+require("neodev").setup({})                                                                     -- LSP integration specifically for using lua to configure nvim
 require("mason").setup()                                                                        -- LSP package manager
 require('Comment').setup({                                                                      -- LSP specifically for adding comments
     toggler = { line = "<leader>c", block = "<leader>bc" },
     opleader = { line = "<leader>c", block = "<leader>bc" }
 })
 require('ts_context_commentstring').setup({})                     -- LSP specifically for adding comments in JSX/TSX
-require("nvim-treesitter.configs").setup({ auto_install = true }) -- Automatically install missing parsers when entering buffe
+require("nvim-treesitter.configs").setup({ 
+    auto_install = true,                                           -- Automatically install missing parsers when entering buffer
+    highlight = { enabled = true },
+}) 
+
 require("luasnip")
 
 local lsp_zero = require("lsp-zero")
@@ -156,7 +162,7 @@ cmp.setup({
 
 })
 
-local on_attach = function(_, bufnr)
+local on_attach = function(client, bufnr)
     local opts = { buffer = bufnr, remap = false }
     vim.keymap.set("n", "H", vim.lsp.buf.hover, opts)                            -- Hovering over text reveals information about the symbol
     vim.keymap.set("n", "<leader>ld", vim.lsp.buf.definition, opts)              -- Jump to definition
@@ -175,9 +181,10 @@ local on_attach = function(_, bufnr)
     vim.keymap.set('n', '<leader>wl', function()
         print(vim.inspect(vim.lsp.buf.list_workspace_folders()))                 -- List workspace folders
     end, opts)
+    require("illuminate").on_attach(client)
 end
 
-local servers = { 'pyright', 'tsserver', "gopls", }
+local servers = { 'pyright', 'tsserver', "gopls", "tailwindcss" }
 for _, lsp in ipairs(servers) do
     lspconfig[lsp].setup {
         on_attach = on_attach,
@@ -185,16 +192,11 @@ for _, lsp in ipairs(servers) do
     }
 end
 
-vim.api.nvim_create_autocmd("BufWritePre", {
-    pattern = "*.go",
+vim.api.nvim_create_autocmd("BufWritePre", {                                     -- Go automatic import sorting
+    pattern = "*.go",                                                            -- https://github.com/golang/tools/blob/master/gopls/doc/vim.md#imports-and-formatting
     callback = function()
         local params = vim.lsp.util.make_range_params()
         params.context = { only = { "source.organizeImports" } }
-        -- buf_request_sync defaults to a 1000ms timeout. Depending on your
-        -- machine and codebase, you may want longer. Add an additional
-        -- argument after params if you find that you have to write the file
-        -- twice for changes to be saved.
-        -- E.g., vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 3000)
         local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params)
         for cid, res in pairs(result or {}) do for _, r in pairs(res.result or {}) do
                 if r.edit then
@@ -229,17 +231,31 @@ lspconfig.gopls.setup({
     }
 })
 
--- lspconfig.lua_ls.setup({
---     on_attach = on_attach,
---     settings = {
---         Lua = {
---             diagnostics = { enable = false },
---             workspace = {
---                 checkThirdParty = false
---             }
---         }
---     }
--- })
+lspconfig.tsserver.setup {
+  on_attach = function(client, bufnr)
+    vim.api.nvim_buf_set_option(bufnr, 'expandtab', true)  -- 
+    vim.api.nvim_buf_set_option(bufnr, 'tabstop', 2)
+    vim.api.nvim_buf_set_option(bufnr, 'shiftwidth', 2)
+    require("illuminate").on_attach(client)
+  end
+}
+
+lspconfig.lua_ls.setup({
+    on_attach = on_attach,
+    settings = {
+        Lua = {
+            diagnostics = { enable = false },
+            workspace = {
+                checkThirdParty = false                    -- Disabled because libraries don't make the optional parts of config optional in the type system.
+            }
+        }
+    }
+})
+
+vim.cmd [[
+let g:astro_typescript = 'enable'
+]]
+lspconfig.astro.setup({})
 
 vim.diagnostic.config({
     virtual_text = true

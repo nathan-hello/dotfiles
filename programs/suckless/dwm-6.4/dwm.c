@@ -822,39 +822,46 @@ focusin(XEvent *e)
 		setfocus(selmon->sel);
 }
 
-// void
-// focusmon(const Arg *arg)
-// {
-// Monitor *m;
-// 
-// if (!mons->next)
-// 	return;
-// if ((m = dirtomon(arg->i)) == selmon)
-// 	return;
-// unfocus(selmon->sel, 0);
-// selmon = m;
-// focus(NULL);
-// }
-
 void
 focusmon(const Arg *arg)
 {
-	Monitor *m = NULL;
-	int target = arg->i;
-	int i = 0;
+Monitor *m;
 
-	for (m = mons; m; m = m->next, ++i) {
-		if (i == target) {
-			break;
-		}
-	}
-
-	if (m && m != selmon) {
-		unfocus(selmon->sel, 0);
-		selmon = m;
-		focus(NULL);
-	}
+if (!mons->next)
+	return;
+if ((m = dirtomon(arg->i)) == selmon)
+	return;
+unfocus(selmon->sel, 0);
+selmon = m;
+focus(NULL);
 }
+
+// This implementation changes it to be a toggle. Receives an int >= 0 and
+// focuses the appropiate teminal. Removed on 02DEC023 because of issues
+// with which monitor was 0 and which was 1
+// Entirely written by ChatGPT, I'm honestly surprised it worked as well as it did.
+// Only issue is the actual monitor it changes. That, and dmenu sometimes gets put 
+// on the wrong monitor, but that could be unrelated.
+//  - nate, 02DEC2023
+// void
+// focusmon(const Arg *arg)
+// {
+// 	Monitor *m = NULL;
+// 	int target = arg->i;
+// 	int i = 0;
+//
+// 	for (m = mons; m; m = m->next, ++i) {
+// 		if (i == target) {
+// 			break;
+// 		}
+// 	}
+//
+// 	if (m && m != selmon) {
+// 		unfocus(selmon->sel, 0);
+// 		selmon = m;
+// 		focus(NULL);
+// 	}
+// }
 
 void
 focusstack(const Arg *arg)
