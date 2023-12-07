@@ -29,20 +29,25 @@ COMPLETION_WAITING_DOTS="true"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(git)
 
+unsetopt AUTO_CD
 alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME"
 alias la="exa -lah --header"
+alias mpvc='mpv --sub-align-x=center --sub-font="Arial" --sub-font-size=36 --sub-color="#FFFFFF" --sub-border-color="#000000" --sub-shadow-color="#000000" --sub-shadow-offset=1 --sub-ass-force-style="MarginL=512,MarginR=512"'
+alias flogout="pkill -KILL -u $(whoami)"
 
+
+mkdir -p $HOME/programs/go
+export GOPATH=$HOME/programs/go/bin
+
+export PATH=$GOPATH:$PATH
 export PATH=$HOME/bin:/usr/local/bin:$PATH
 export PATH=$HOME/.cargo/bin:$PATH
 export PATH=$HOME/.local/bin:$PATH
+export PATH=$HOME/.local/bin/dwmblocks:$PATH
+export PATH=/usr/local/go/bin:$PATH
 
-
-
-
-
-
-
-
-
-
-
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+# bun completions
+[ -s "/home/nate/.bun/_bun" ] && source "/home/nate/.bun/_bun"
