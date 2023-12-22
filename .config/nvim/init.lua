@@ -200,15 +200,41 @@ local on_attach = function(client, bufnr)
     require("illuminate").on_attach(client)
 end
 
+local on_attach_with_2_space_tabs = function(client, bufnr)
+    local opts = { buffer = bufnr, remap = false }
+    vim.api.nvim_buf_set_option(bufnr, 'expandtab', true)                        -- Tab = Space
+    vim.api.nvim_buf_set_option(bufnr, 'tabstop', 2)                             -- 2 space tab
+    vim.api.nvim_buf_set_option(bufnr, 'shiftwidth', 2)                          -- 2 space tab
+    vim.keymap.set("n", "H", vim.lsp.buf.hover, opts)                            -- Hovering over text reveals information about the symbol
+    vim.keymap.set("n", "<leader>ld", vim.lsp.buf.definition, opts)              -- Jump to definition
+    vim.keymap.set('n', '<leader>ltd', vim.lsp.buf.type_definition, opts)        -- [not sure]
+    vim.keymap.set("n", "<leader>vws", vim.lsp.buf.workspace_symbol, opts)       -- [not sure]
+    vim.keymap.set("n", "<leader>vd", vim.diagnostic.open_float, opts)           -- Open quickfix
+    vim.keymap.set("n", "<leader>ln", vim.diagnostic.goto_next, opts)            -- Goto next problem
+    vim.keymap.set("n", "<leader>lp", vim.diagnostic.goto_prev, opts)            -- Goto previous problem
+    vim.keymap.set("n", "<leader>lws", vim.lsp.buf.workspace_symbol, opts)       -- Search for a symbol, make a quicklist of all instances of that symbol
+    vim.keymap.set("n", "<leader>lca", vim.lsp.buf.code_action, opts)            -- Open all available code actions
+    vim.keymap.set("n", "<leader>lrr", vim.lsp.buf.references, opts)             -- Open all references to hovered symbol
+    vim.keymap.set("n", "<leader>lrn", vim.lsp.buf.rename, opts)                 -- Rename all instances. Uses LSP.
+    vim.keymap.set("n", "<leader>lf", custom_format, opts)                       -- Format file
+    vim.keymap.set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, opts)    -- Inform LSP of workspace folder
+    vim.keymap.set('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, opts) -- Remove workspace folder from LSP
+    vim.keymap.set('n', '<leader>wl', function()
+        print(vim.inspect(vim.lsp.buf.list_workspace_folders()))                 -- List workspace folders
+    end, opts)
+    require("illuminate").on_attach(client)
+end
+
 -- LSPs! --
+lspconfig.html.setup({
+    on_attach = on_attach_with_2_space_tabs,
+    capabilities = capabilities,
+    filetypes = {"html", "templ"},
+})
 
 lspconfig.templ.setup({
-    on_attach = on_attach,
+    on_attach = on_attach_with_2_space_tabs,
     capabilities = capabilities,
-    vim.api.nvim_buf_set_option(bufnr, 'expandtab', true) -- Tab = Space
-    vim.api.nvim_buf_set_option(bufnr, 'tabstop', 2)      -- 2 space tab
-    vim.api.nvim_buf_set_option(bufnr, 'shiftwidth', 2)   -- 2 space tab
-    require("illuminate").on_attach(client)               -- Had to enable illuminate specifically on .ts files for some reason})
 })
 
 vim.filetype.add({ extension = { templ = "templ" } })
@@ -218,30 +244,19 @@ vim.api.nvim_create_autocmd("BufEnter", {
 })
 
 lspconfig.htmx.setup({
-    on_attach = on_attach,
+    on_attach = on_attach_with_2_space_tabs,
     capabilities = capabilities,
-    vim.api.nvim_buf_set_option(bufnr, 'expandtab', true) -- Tab = Space
-    vim.api.nvim_buf_set_option(bufnr, 'tabstop', 2)      -- 2 space tab
-    vim.api.nvim_buf_set_option(bufnr, 'shiftwidth', 2)   -- 2 space tab
-    require("illuminate").on_attach(client)               -- Had to enable illuminate specifically on .ts files for some reason})
+    filetypes = {"html", "templ"},
 })
 
 lspconfig.tsserver.setup({
-    on_attach = on_attach,
+    on_attach = on_attach_with_2_space_tabs,
     capabilities = capabilities,
-    vim.api.nvim_buf_set_option(bufnr, 'expandtab', true) -- Tab = Space
-    vim.api.nvim_buf_set_option(bufnr, 'tabstop', 2)      -- 2 space tab
-    vim.api.nvim_buf_set_option(bufnr, 'shiftwidth', 2)   -- 2 space tab
-    require("illuminate").on_attach(client)               -- Had to enable illuminate specifically on .ts files for some reason})
 })
 
 lspconfig.astro.setup({
-    on_attach = on_attach,
+    on_attach = on_attach_with_2_space_tabs,
     capabilities = capabilities,
-    vim.api.nvim_buf_set_option(bufnr, 'expandtab', true) -- Tab = Space
-    vim.api.nvim_buf_set_option(bufnr, 'tabstop', 2)      -- 2 space tab
-    vim.api.nvim_buf_set_option(bufnr, 'shiftwidth', 2)   -- 2 space tab
-    require("illuminate").on_attach(client)               -- Had to enable illuminate specifically on .ts files for some reason})
 })
 
 vim.cmd [[
@@ -249,7 +264,7 @@ let g:astro_typescript = 'enable'
 ]]
 
 lspconfig.tailwindcss.setup({
-    on_attach = on_attach,
+    on_attach = on_attach_with_2_space_tabs,
     capabilities = capabilities,
     filetypes = { "templ", "astro", "javascript", "typescript", "react" },
     init_options = { userLanguages = { templ = "html" } },
