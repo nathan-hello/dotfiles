@@ -6,20 +6,20 @@ vim.opt.rtp:prepend(lazypath)
 package.path = package.path .. ';' .. vim.fn.stdpath('config') .. '/?.lua'
 
 require("lazy").setup({
-    { "folke/which-key.nvim" },                                                                                            -- https://github.com/folke/which-key.nvim
-    { "numToStr/Comment.nvim" },                                                                                           -- https://github.com/numToStr/Comment.nvim
-    { "JoosepAlviste/nvim-ts-context-commentstring" },                                                                     -- https://github.com/JoosepAlviste/nvim-ts-context-commentstring
-    { "neovim/nvim-lspconfig" },                                                                                           -- https://github.com/VonHeikemen/lsp-zero.nvim
-    { "williamboman/mason.nvim" },                                                                                         -- https://github.com/VonHeikemen/lsp-zero.nvim
-    { "kyazdani42/nvim-tree.lua", },                                                                                       -- https://github.com/nvim-tree/nvim-tree.lua
-    { "nvim-tree/nvim-web-devicons", },                                                                                    -- https://github.com/nvim-tree/nvim-web-devicons
-    { "williamboman/mason-lspconfig.nvim" },                                                                               -- https://github.com/williamboman/mason-lspconfig.nvim
-    { "VonHeikemen/lsp-zero.nvim",                  branch = "v3.x" },                                                     -- https://github.com/VonHeikemen/lsp-zero.nvim
-    { "nvim-treesitter/nvim-treesitter",            cmd = "TSUpdate" },                                                    -- https://github.com/nvim-treesitter/nvim-treesitter
-    { "catppuccin/nvim",                            name = "catppuccin-mocha",                       priority = 1000 },    -- https://github.com/catppuccin/nvim
-    { "kdheepak/lazygit.nvim",                      dependencies = { "nvim-lua/plenary.nvim" }, },                         -- https://github.com/kdheepak/lazygit.nvim
-    { "nvim-lualine/lualine.nvim",                  dependencies = { "nvim-tree/nvim-web-devicons" } },                    -- https://github.com/nvim-lualine/lualine.nvim
-    { "nvim-telescope/telescope.nvim",              dependencies = { "nvim-lua/plenary.nvim" } },                          -- https://github.com/nvim-telescope/telescope.nvim
+    { "folke/which-key.nvim" },                                                                                          -- https://github.com/folke/which-key.nvim
+    { "numToStr/Comment.nvim" },                                                                                         -- https://github.com/numToStr/Comment.nvim
+    { "JoosepAlviste/nvim-ts-context-commentstring" },                                                                   -- https://github.com/JoosepAlviste/nvim-ts-context-commentstring
+    { "neovim/nvim-lspconfig" },                                                                                         -- https://github.com/VonHeikemen/lsp-zero.nvim
+    { "williamboman/mason.nvim" },                                                                                       -- https://github.com/VonHeikemen/lsp-zero.nvim
+    { "kyazdani42/nvim-tree.lua", },                                                                                     -- https://github.com/nvim-tree/nvim-tree.lua
+    { "nvim-tree/nvim-web-devicons", },                                                                                  -- https://github.com/nvim-tree/nvim-web-devicons
+    { "williamboman/mason-lspconfig.nvim" },                                                                             -- https://github.com/williamboman/mason-lspconfig.nvim
+    { "VonHeikemen/lsp-zero.nvim",                  branch = "v3.x" },                                                   -- https://github.com/VonHeikemen/lsp-zero.nvim
+    { "nvim-treesitter/nvim-treesitter",            cmd = "TSUpdate" },                                                  -- https://github.com/nvim-treesitter/nvim-treesitter
+    { "catppuccin/nvim",                            name = "catppuccin-mocha",                        priority = 1000 }, -- https://github.com/catppuccin/nvim
+    { "kdheepak/lazygit.nvim",                      dependencies = { "nvim-lua/plenary.nvim" }, },                       -- https://github.com/kdheepak/lazygit.nvim
+    { "nvim-lualine/lualine.nvim",                  dependencies = { "nvim-tree/nvim-web-devicons" } },                  -- https://github.com/nvim-lualine/lualine.nvim
+    { "nvim-telescope/telescope.nvim",              dependencies = { "nvim-lua/plenary.nvim" } },                        -- https://github.com/nvim-telescope/telescope.nvim
     { "hrsh7th/nvim-cmp" },
     { "hrsh7th/cmp-buffer" },
     { "hrsh7th/cmp-path" },
@@ -30,7 +30,18 @@ require("lazy").setup({
     { "L3MON4D3/LuaSnip" },
     { "RRethy/vim-illuminate" },
     { "maxmellon/vim-jsx-pretty" },
-    { "wuelnerdotexe/vim-astro"},
+    { "wuelnerdotexe/vim-astro" },
+    { "folke/trouble.nvim",                         dependencies = { "nvim-tree/nvim-web-devicons" }, opts = {} },
+    {
+        "iamcco/markdown-preview.nvim",
+        cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+        ft = { "markdown" },
+        build = function()
+            vim.fn["mkdp#util#install"]()
+        end,
+    }, -- https://github.com/iamcco/markdown-preview.nvim
+    -- { "joerdav/templ.vim"},
+    -- { "vrischmann/tree-sitter-templ", config = function() require("tree-sitter-templ").setup({}) end }                  -- https://github.com/vrischmann/tree-sitter-templ/commit/2a8326a0ee921c5ed24b3e627283390b7bf1d64f
 })
 
 vim.g.mapleader = " "                                     -- Space!
@@ -39,12 +50,16 @@ vim.g.loaded_netrw = 1                                    -- Disable netrw for N
 require("nvim-tree").setup({ view = { side = "right" } }) -- Nvim Tree
 local telescope = require("telescope.builtin")            -- Telescope for keybinds later
 
-local function lsp_status()                               -- Get name of LSP
+local function lsp_status()
     local clients = vim.lsp.get_active_clients()
     if next(clients) == nil then
         return "No LSP"
     else
-        return clients[1].name
+        local client_names = {}
+        for _, client in ipairs(clients) do
+            table.insert(client_names, client.name)
+        end
+        return table.concat(client_names, ", ")
     end
 end
 
@@ -60,7 +75,8 @@ require("lualine").setup({
 })
 
 vim.opt.termguicolors = true                                                                    -- Set termguicolors to enable highlight groups
-vim.opt.guicursor = ""                                                                          -- Empty string disables special GUI-based cursor styling.
+vim.opt.guicursor =
+""                                                                                              -- Empty string disables special GUI-based cursor styling.
 vim.opt.nu = true                                                                               -- Enables line numbering.
 vim.opt.tabstop = 4                                                                             -- Sets the number of spaces for a tab character.
 vim.opt.softtabstop = 4                                                                         -- Number of spaces to use for auto-indenting.
@@ -76,9 +92,9 @@ vim.opt.hlsearch = true                                                         
 vim.opt.incsearch = true                                                                        -- Highlights search matches as you type.
 vim.opt.termguicolors = true                                                                    -- Enables color.
 vim.opt.scrolloff = 8                                                                           -- Keeps 8 lines between cursor and window edge while scrolling.
-vim.opt.signcolumn = "yes"                                                                      -- Always show the sign column.
+vim.opt.signcolumn =
+"yes"                                                                                           -- Always show the sign column.
 vim.opt.updatetime = 50                                                                         -- Sets the time (in ms) that triggers CursorHold event.
-
 vim.api.nvim_create_autocmd("InsertEnter", { pattern = '*', command = 'set norelativenumber' }) -- Relative line numbers in insert mode
 vim.api.nvim_create_autocmd("InsertLeave", { pattern = '*', command = 'set relativenumber' })   -- Disable relative line when leaving insert
 
@@ -124,43 +140,43 @@ require('Comment').setup({                                                      
     toggler = { line = "<leader>c", block = "<leader>bc" },
     opleader = { line = "<leader>c", block = "<leader>bc" }
 })
-require('ts_context_commentstring').setup({})                     -- LSP specifically for adding comments in JSX/TSX
-require("nvim-treesitter.configs").setup({ 
-    auto_install = true,                                           -- Automatically install missing parsers when entering buffer
-    highlight = { enabled = true },
-}) 
+require('ts_context_commentstring').setup({})                                 -- LSP specifically for adding comments in JSX/TSX
+require("nvim-treesitter.configs").setup({                                    -- Treesitter setup
+    auto_install = true,                                                      -- Auto install missing parser when entering buffer
+    highlight = { enabled = true, additional_vim_regex_highlighting = true }, -- Highlight!
+})
 
 require("luasnip")
 
-local lsp_zero = require("lsp-zero")
+local treesitter_parser_config = require("nvim-treesitter.parsers").get_parser_configs()
 local cmp = require('cmp')
+local lsp_zero = require("lsp-zero")
 local lspconfig = require("lspconfig")
 capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
 
 require("mason-lspconfig").setup({ handlers = { lsp_zero.default_setup } })
 
 cmp.setup({
-    window = {
-        completion = cmp.config.window.bordered(),
-        documentation = cmp.config.window.bordered(),
-    },
-    sources = {
-        { name = "nvim_lsp" },
-        { name = "luasnip" },
-    },
+    sources = { { name = "nvim_lsp" }, { name = "luasnip" }, },
+    window = { completion = cmp.config.window.bordered(), documentation = cmp.config.window.bordered(), },
     mapping = cmp.mapping.preset.insert({
         ['<C-j>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }),
         ['<C-k>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }),
         ['<C-Space>'] = cmp.mapping.complete({}),
-        ['<CR>'] = cmp.mapping.confirm {
-            behavior = cmp.ConfirmBehavior.Replace,
-            select = true,
-        },
+        ['<CR>'] = cmp.mapping.confirm { behavior = cmp.ConfirmBehavior.Replace, select = true, },
         ['<C-u>'] = cmp.mapping.scroll_docs(-4),
         ['<C-d>'] = cmp.mapping.scroll_docs(4),
     }),
-
 })
+
+local custom_format = function()
+    if vim.bo.filetype == "astro" then
+        local cmd = "silent !prettier --write " .. vim.fn.shellescape(vim.api.nvim_buf_get_name(0))
+        vim.cmd(cmd)
+    else
+        vim.lsp.buf.format()
+    end
+end
 
 local on_attach = function(client, bufnr)
     local opts = { buffer = bufnr, remap = false }
@@ -175,7 +191,7 @@ local on_attach = function(client, bufnr)
     vim.keymap.set("n", "<leader>lca", vim.lsp.buf.code_action, opts)            -- Open all available code actions
     vim.keymap.set("n", "<leader>lrr", vim.lsp.buf.references, opts)             -- Open all references to hovered symbol
     vim.keymap.set("n", "<leader>lrn", vim.lsp.buf.rename, opts)                 -- Rename all instances. Uses LSP.
-    vim.keymap.set("n", "<leader>lf", vim.lsp.buf.format, opts)                  -- Format file
+    vim.keymap.set("n", "<leader>lf", custom_format, opts)                       -- Format file
     vim.keymap.set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, opts)    -- Inform LSP of workspace folder
     vim.keymap.set('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, opts) -- Remove workspace folder from LSP
     vim.keymap.set('n', '<leader>wl', function()
@@ -184,40 +200,69 @@ local on_attach = function(client, bufnr)
     require("illuminate").on_attach(client)
 end
 
-local servers = { 'pyright', 'tsserver', "gopls", "tailwindcss" }
-for _, lsp in ipairs(servers) do
-    lspconfig[lsp].setup {
-        on_attach = on_attach,
-        capabilities = capabilities,
-    }
-end
+-- LSPs! --
 
-vim.api.nvim_create_autocmd("BufWritePre", {                                     -- Go automatic import sorting
-    pattern = "*.go",                                                            -- https://github.com/golang/tools/blob/master/gopls/doc/vim.md#imports-and-formatting
-    callback = function()
-        local params = vim.lsp.util.make_range_params()
-        params.context = { only = { "source.organizeImports" } }
-        local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params)
-        for cid, res in pairs(result or {}) do for _, r in pairs(res.result or {}) do
-                if r.edit then
-                    local enc = (vim.lsp.get_client_by_id(cid) or {}).offset_encoding or "utf-16"
-                    vim.lsp.util.apply_workspace_edit(r.edit, enc)
-                end
-            end
-        end
-        vim.lsp.buf.format({ async = false })
-    end
+lspconfig.templ.setup({
+    on_attach = on_attach,
+    capabilities = capabilities,
+    vim.api.nvim_buf_set_option(bufnr, 'expandtab', true) -- Tab = Space
+    vim.api.nvim_buf_set_option(bufnr, 'tabstop', 2)      -- 2 space tab
+    vim.api.nvim_buf_set_option(bufnr, 'shiftwidth', 2)   -- 2 space tab
+    require("illuminate").on_attach(client)               -- Had to enable illuminate specifically on .ts files for some reason})
+})
+
+vim.filetype.add({ extension = { templ = "templ" } })
+vim.api.nvim_create_autocmd("BufEnter", {
+    pattern = "*.templ",
+    callback = function() vim.cmd("TSBufEnable highlight") end
+})
+
+lspconfig.htmx.setup({
+    on_attach = on_attach,
+    capabilities = capabilities,
+    vim.api.nvim_buf_set_option(bufnr, 'expandtab', true) -- Tab = Space
+    vim.api.nvim_buf_set_option(bufnr, 'tabstop', 2)      -- 2 space tab
+    vim.api.nvim_buf_set_option(bufnr, 'shiftwidth', 2)   -- 2 space tab
+    require("illuminate").on_attach(client)               -- Had to enable illuminate specifically on .ts files for some reason})
+})
+
+lspconfig.tsserver.setup({
+    on_attach = on_attach,
+    capabilities = capabilities,
+    vim.api.nvim_buf_set_option(bufnr, 'expandtab', true) -- Tab = Space
+    vim.api.nvim_buf_set_option(bufnr, 'tabstop', 2)      -- 2 space tab
+    vim.api.nvim_buf_set_option(bufnr, 'shiftwidth', 2)   -- 2 space tab
+    require("illuminate").on_attach(client)               -- Had to enable illuminate specifically on .ts files for some reason})
+})
+
+lspconfig.astro.setup({
+    on_attach = on_attach,
+    capabilities = capabilities,
+    vim.api.nvim_buf_set_option(bufnr, 'expandtab', true) -- Tab = Space
+    vim.api.nvim_buf_set_option(bufnr, 'tabstop', 2)      -- 2 space tab
+    vim.api.nvim_buf_set_option(bufnr, 'shiftwidth', 2)   -- 2 space tab
+    require("illuminate").on_attach(client)               -- Had to enable illuminate specifically on .ts files for some reason})
+})
+
+vim.cmd [[
+let g:astro_typescript = 'enable'
+]]
+
+lspconfig.tailwindcss.setup({
+    on_attach = on_attach,
+    capabilities = capabilities,
+    filetypes = { "templ", "astro", "javascript", "typescript", "react" },
+    init_options = { userLanguages = { templ = "html" } },
 })
 
 lspconfig.gopls.setup({
     on_attach = on_attach,
+    capabilities = capabilities,
     settings = {
         gopls = {
             semanticTokens = true,
-            analyses = {
-                unusedparams = true,
-            },
             staticcheck = true,
+            analyses = { unusedparams = true, },
             hints = {
                 assignVariableTypes = true,
                 compositeLiteralFields = true,
@@ -231,32 +276,30 @@ lspconfig.gopls.setup({
     }
 })
 
-lspconfig.tsserver.setup {
-  on_attach = function(client, bufnr)
-    vim.api.nvim_buf_set_option(bufnr, 'expandtab', true)  -- 
-    vim.api.nvim_buf_set_option(bufnr, 'tabstop', 2)
-    vim.api.nvim_buf_set_option(bufnr, 'shiftwidth', 2)
-    require("illuminate").on_attach(client)
-  end
-}
+vim.api.nvim_create_autocmd("BufWritePre", { -- Go automatic import sorting
+    pattern = "*.go",                        -- https://github.com/golang/tools/blob/master/gopls/doc/vim.md#imports-and-formatting
+    callback = function()
+        local params = vim.lsp.util.make_range_params()
+        params.context = { only = { "source.organizeImports" } }
+        local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params)
+        for cid, res in pairs(result or {}) do
+            for _, r in pairs(res.result or {}) do
+                if r.edit then
+                    local enc = (vim.lsp.get_client_by_id(cid) or {}).offset_encoding or "utf-16"
+                    vim.lsp.util.apply_workspace_edit(r.edit, enc)
+                end
+            end
+        end
+        vim.lsp.buf.format({ async = false })
+    end
+})
 
 lspconfig.lua_ls.setup({
     on_attach = on_attach,
     settings = {
         Lua = {
             diagnostics = { enable = false },
-            workspace = {
-                checkThirdParty = false                    -- Disabled because libraries don't make the optional parts of config optional in the type system.
-            }
+            workspace = { checkThirdParty = false } -- Disabled because libraries don't make the optional parts of config optional in the type system. }
         }
     }
-})
-
-vim.cmd [[
-let g:astro_typescript = 'enable'
-]]
-lspconfig.astro.setup({})
-
-vim.diagnostic.config({
-    virtual_text = true
 })
