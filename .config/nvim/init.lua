@@ -42,9 +42,33 @@ require("lazy").setup({
 vim.g.mapleader = " "                                                                           -- Space!
 vim.cmd.colorscheme "catppuccin-mocha"                                                          -- https://github.com/catppuccin/nvim
 vim.g.loaded_netrw = 1                                                                          -- Disable netrw for NvimTree
-local telescope = require("telescope.builtin")                                                  -- Telescope for keybinds later
+local telescope  = require("telescope")
+local telescopec = require("telescope.config")
+local telescopeb = require("telescope.builtin")                                                 -- Telescope for keybinds later
+-- The following is taken from https://github.com/nvim-telescope/telescope.nvim/wiki/Configuration-Recipes
+local vimgrep_arguments = { unpack(telescopec.values.vimgrep_arguments) }                       -- Clone the default Telescope configuration
+table.insert(vimgrep_arguments, "--hidden")                                                     -- I want to search in hidden/dot files.
+table.insert(vimgrep_arguments, "--glob")                                                       -- I don't want to search in the `.git` directory.
+table.insert(vimgrep_arguments, "!**/.git/*")
 
+telescope.setup({
+	defaults = {
+		vimgrep_arguments = vimgrep_arguments,                                                  -- `hidden = true` is not supported in text grep commands.
+	},
+	pickers = {
+		find_files = {
+			find_command = {                                                                    
+                "rg", 
+                "--files", 
+                "--hidden",                                                                     -- make :Telescope find_files find hidden files 
+                "--no-ignore",                                                                  -- make :Telescope find_files not respect gitignore
+                "--glob", "!**/.git/*",                                                         -- But it still won't look inside of these folders
+                "--glob", "!**/node_modules/*",                                                 -- But it still won't look inside of these folders
 
+            },             
+		},
+	},
+})
 
 
 local function open_nvim_tree(data)                                                             -- Nvim-Tree recipe. https://github.com/nvim-tree/nvim-tree.lua/wiki/Open-At-Startup#open-for-files-and-no-name-buffers
@@ -68,7 +92,11 @@ local function lsp_status()                                                     
         return table.concat(client_names, ", ")
     end
 end
-require("nvim-tree").setup({ view = { side = "right" }})
+require("nvim-tree").setup({ 
+    view = { side = "right" },
+    git = { enable = true, ignore = false, timeout = 500, },
+})
+
 vim.api.nvim_create_autocmd({ "VimEnter" }, { callback = open_nvim_tree })
 
 require("lualine").setup({                                                                      -- https://github.com/nvim-lualine/lualine.nvim
@@ -121,10 +149,10 @@ vim.keymap.set("n", "<leader>)", "<Cmd>NvimTreeClose<CR>")                      
 vim.keymap.set("n", "<leader>-", "<cmd>vertical resize -16<CR>")                                -- Shrink window
 vim.keymap.set("n", "<leader>=", "<cmd>vertical resize +16<CR>")                                -- Grow window
 
-vim.keymap.set("n", "<leader>ff", telescope.find_files)                                         -- Open telescope
-vim.keymap.set("n", "<leader>fg", telescope.live_grep)                                          -- Grep entire working dir
-vim.keymap.set("n", "<leader>fb", telescope.buffers)                                            -- Open buffers
-vim.keymap.set("n", "<leader>fh", telescope.help_tags)                                          -- Search :help
+vim.keymap.set("n", "<leader>ff", telescopeb.find_files)                                        -- Open telescope
+vim.keymap.set("n", "<leader>fg", telescopeb.live_grep)                                         -- Grep entire working dir
+vim.keymap.set("n", "<leader>fb", telescopeb.buffers)                                           -- Open buffers
+vim.keymap.set("n", "<leader>fh", telescopeb.help_tags)                                         -- Search :help
 
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")                                                    -- Move selection up
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")                                                    -- Move selection down
@@ -133,6 +161,7 @@ vim.keymap.set("n", "<C-d>", "<C-d>zz")                                         
 vim.keymap.set("n", "<C-u>", "<C-u>zz")                                                         -- Keep cursor in middle when going down
 vim.keymap.set("n", "n", "nzzzv")                                                               -- Keep cursor in middle when searching
 vim.keymap.set("n", "N", "Nzzzv")                                                               -- Keep cursor in middle when searching
+vim.keymap.set("n", "<leader>h", ":noh")                                                        -- Unhighlight find selections
 vim.keymap.set({ "n", "v", "x" }, "<leader>p", [["_dP]])                                        -- System clipboard paste
 vim.keymap.set({ "n", "v", "x" }, "<leader>y", [["+y]])                                         -- System clipboard yank
 vim.keymap.set({ "n", "v", "x" }, "<leader>Y", [["+Y]])                                         -- System clipboard yank current line
