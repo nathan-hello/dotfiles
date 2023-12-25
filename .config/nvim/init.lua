@@ -32,25 +32,31 @@ require("lazy").setup({
     { "maxmellon/vim-jsx-pretty" },
     { "wuelnerdotexe/vim-astro" },
     { "folke/trouble.nvim",                         dependencies = { "nvim-tree/nvim-web-devicons" }, opts = {} },
-    {
-        "iamcco/markdown-preview.nvim",
-        cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
-        ft = { "markdown" },
-        build = function()
-            vim.fn["mkdp#util#install"]()
-        end,
-    }, -- https://github.com/iamcco/markdown-preview.nvim
-    -- { "joerdav/templ.vim"},
-    -- { "vrischmann/tree-sitter-templ", config = function() require("tree-sitter-templ").setup({}) end }                  -- https://github.com/vrischmann/tree-sitter-templ/commit/2a8326a0ee921c5ed24b3e627283390b7bf1d64f
+    { "iamcco/markdown-preview.nvim",                                                                                    -- https://github.com/iamcco/markdown-preview.nvim
+        cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" }, 
+        ft = { "markdown" }, 
+        build = function() vim.fn["mkdp#util#install"]() end, 
+    }, 
 })
 
-vim.g.mapleader = " "                                     -- Space!
-vim.cmd.colorscheme "catppuccin-mocha"                    -- https://github.com/catppuccin/nvim
-vim.g.loaded_netrw = 1                                    -- Disable netrw for NvimTree
-require("nvim-tree").setup({ view = { side = "right" } }) -- Nvim Tree
-local telescope = require("telescope.builtin")            -- Telescope for keybinds later
+vim.g.mapleader = " "                                                                           -- Space!
+vim.cmd.colorscheme "catppuccin-mocha"                                                          -- https://github.com/catppuccin/nvim
+vim.g.loaded_netrw = 1                                                                          -- Disable netrw for NvimTree
+local telescope = require("telescope.builtin")                                                  -- Telescope for keybinds later
 
-local function lsp_status()
+
+
+
+local function open_nvim_tree(data)                                                             -- Nvim-Tree recipe. https://github.com/nvim-tree/nvim-tree.lua/wiki/Open-At-Startup#open-for-files-and-no-name-buffers
+  local directory = vim.fn.isdirectory(data.file) == 1                                          -- buffer is a directory
+  if not directory then                                                                         -- If opening a file, don't open nvim-tree!
+    return
+  end
+  vim.cmd.cd(data.file)                                                                         -- change to the directory
+  require("nvim-tree.api").tree.open()                                                          -- open the tree
+end
+
+local function lsp_status()                                                                     -- Get a list of all LSPs active, and return them in a comma-separated string.
     local clients = vim.lsp.get_active_clients()
     if next(clients) == nil then
         return "No LSP"
@@ -62,15 +68,20 @@ local function lsp_status()
         return table.concat(client_names, ", ")
     end
 end
+require("nvim-tree").setup({ view = { side = "right" }})
+vim.api.nvim_create_autocmd({ "VimEnter" }, { callback = open_nvim_tree })
 
-require("lualine").setup({
+require("lualine").setup({                                                                      -- https://github.com/nvim-lualine/lualine.nvim
+    options = {
+        icons_enabled = false,
+    },
     sections = {
         lualine_a = { 'mode' },
         lualine_b = { 'branch', 'diff', 'diagnostics' },
-        lualine_c = {},
-        lualine_x = { 'encoding', 'filename', lsp_status },
-        lualine_y = { 'location' },
-        lualine_z = {}
+        lualine_c = { { 'filename', path = 3 }, 'filesize', 'encoding',  },               
+        lualine_x = { 'searchcount' },
+        lualine_y = { lsp_status },
+        lualine_z = { 'hostname', 'buffers', 'location' }
     },
 })
 
@@ -173,6 +184,9 @@ local custom_format = function()
     if vim.bo.filetype == "astro" then
         local cmd = "silent !prettier --write " .. vim.fn.shellescape(vim.api.nvim_buf_get_name(0))
         vim.cmd(cmd)
+    elseif vim.bo.filetype == "templ" then -- Templ files default formatting doesn't use the templ fmt command. Possibly because there are five (5!) lsps attached to the buffer
+        local cmd = "silent !templ fmt " .. vim.fn.shellescape(vim.api.nvim_buf_get_name(0))
+        vim.cmd(cmd)
     else
         vim.lsp.buf.format()
     end
@@ -229,7 +243,7 @@ end
 lspconfig.html.setup({
     on_attach = on_attach_with_2_space_tabs,
     capabilities = capabilities,
-    filetypes = {"html", "templ"},
+    filetypes = { "html", "templ" },
 })
 
 lspconfig.templ.setup({
@@ -246,13 +260,14 @@ vim.api.nvim_create_autocmd("BufEnter", {
 lspconfig.htmx.setup({
     on_attach = on_attach_with_2_space_tabs,
     capabilities = capabilities,
-    filetypes = {"html", "templ"},
+    filetypes = { "html", "templ" },
 })
 
 lspconfig.tsserver.setup({
     on_attach = on_attach_with_2_space_tabs,
     capabilities = capabilities,
 })
+
 
 lspconfig.astro.setup({
     on_attach = on_attach_with_2_space_tabs,
@@ -318,3 +333,12 @@ lspconfig.lua_ls.setup({
         }
     }
 })
+
+-- Trying to get this to work was a massive waste of time.
+-- To the comment graveyard it goes.
+-- lspconfig.sqlls.setup({
+--     on_attach = on_attach_with_2_space_tabs,
+--     capabilities = capabilities,
+--     filetypes = { "sql" },
+--     root_dir = function(name) return vim.loop.cwd() end,
+-- })
