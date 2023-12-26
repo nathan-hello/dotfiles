@@ -48,8 +48,10 @@ local telescopeb = require("telescope.builtin")                                 
 -- The following is taken from https://github.com/nvim-telescope/telescope.nvim/wiki/Configuration-Recipes
 local vimgrep_arguments = { unpack(telescopec.values.vimgrep_arguments) }                       -- Clone the default Telescope configuration
 table.insert(vimgrep_arguments, "--hidden")                                                     -- I want to search in hidden/dot files.
-table.insert(vimgrep_arguments, "--glob")                                                       -- I don't want to search in the `.git` directory.
-table.insert(vimgrep_arguments, "!**/.git/*")
+table.insert(vimgrep_arguments, "--glob")                                                       -- Argument init
+table.insert(vimgrep_arguments, "!**/.git/*")                                                   -- I don't want to search in the `.git` directory.
+table.insert(vimgrep_arguments, "--glob")                                                       
+table.insert(vimgrep_arguments, "!**/node_modules/*")                                           -- I don't want to search in the `node_modules` directory.
 
 telescope.setup({
 	defaults = {
@@ -109,7 +111,7 @@ require("lualine").setup({                                                      
         lualine_c = { { 'filename', path = 3 }, 'filesize', 'encoding',  },               
         lualine_x = { 'searchcount' },
         lualine_y = { lsp_status },
-        lualine_z = { 'hostname', 'buffers', 'location' }
+        lualine_z = { 'hostname', 'location' }
     },
 })
 
