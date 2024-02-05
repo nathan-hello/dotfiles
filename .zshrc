@@ -37,6 +37,7 @@ alias flogout="pkill -KILL -u $(whoami)"
 alias ds="docker stop $(docker ps -aq)"
 alias sqlcc="DB_URI=$DB_URI sqlc"
 
+export EDITOR=nvim
 
 mkdir -p $HOME/programs/go
 export GOPATH=$HOME/programs/go
