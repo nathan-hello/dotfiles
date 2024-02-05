@@ -37,6 +37,8 @@ require("lazy").setup({
         ft = { "markdown" }, 
         build = function() vim.fn["mkdp#util#install"]() end, 
     }, 
+    { 'lervag/vimtex', dependencies = { 'debian-tex/latexmk' },
+  },
 })
 
 vim.g.mapleader = " "                                                                           -- Space!
@@ -52,6 +54,11 @@ table.insert(vimgrep_arguments, "--glob")                                       
 table.insert(vimgrep_arguments, "!**/.git/*")                                                   -- I don't want to search in the `.git` directory.
 table.insert(vimgrep_arguments, "--glob")                                                       
 table.insert(vimgrep_arguments, "!**/node_modules/*")                                           -- I don't want to search in the `node_modules` directory.
+
+vim.g['vimtex_view_method'] = 'zathura'
+vim.g['vimtex_view_general_viewer'] = 'okular'
+vim.g['vimtex_view_general_options'] = '-unique file:@pdf\\#src:@line@tex'
+vim.g['vimtex_compiler_method'] = 'latexmk'
 
 telescope.setup({
 	defaults = {
@@ -72,7 +79,6 @@ telescope.setup({
 	},
 })
 
-
 local function open_nvim_tree(data)                                                             -- Nvim-Tree recipe. https://github.com/nvim-tree/nvim-tree.lua/wiki/Open-At-Startup#open-for-files-and-no-name-buffers
   local directory = vim.fn.isdirectory(data.file) == 1                                          -- buffer is a directory
   if not directory then                                                                         -- If opening a file, don't open nvim-tree!
@@ -81,6 +87,13 @@ local function open_nvim_tree(data)                                             
   vim.cmd.cd(data.file)                                                                         -- change to the directory
   require("nvim-tree.api").tree.open()                                                          -- open the tree
 end
+
+require("nvim-tree").setup({ 
+    view = { side = "right" },
+    git = { enable = true, ignore = false, timeout = 500, },
+})
+
+vim.api.nvim_create_autocmd({ "VimEnter" }, { callback = open_nvim_tree })
 
 local function lsp_status()                                                                     -- Get a list of all LSPs active, and return them in a comma-separated string.
     local clients = vim.lsp.get_active_clients()
@@ -94,12 +107,6 @@ local function lsp_status()                                                     
         return table.concat(client_names, ", ")
     end
 end
-require("nvim-tree").setup({ 
-    view = { side = "right" },
-    git = { enable = true, ignore = false, timeout = 500, },
-})
-
-vim.api.nvim_create_autocmd({ "VimEnter" }, { callback = open_nvim_tree })
 
 require("lualine").setup({                                                                      -- https://github.com/nvim-lualine/lualine.nvim
     options = {
@@ -116,8 +123,7 @@ require("lualine").setup({                                                      
 })
 
 vim.opt.termguicolors = true                                                                    -- Set termguicolors to enable highlight groups
-vim.opt.guicursor =
-""                                                                                              -- Empty string disables special GUI-based cursor styling.
+vim.opt.guicursor = ""                                                                          -- Empty string disables special GUI-based cursor styling.
 vim.opt.nu = true                                                                               -- Enables line numbering.
 vim.opt.tabstop = 4                                                                             -- Sets the number of spaces for a tab character.
 vim.opt.softtabstop = 4                                                                         -- Number of spaces to use for auto-indenting.
@@ -133,8 +139,7 @@ vim.opt.hlsearch = true                                                         
 vim.opt.incsearch = true                                                                        -- Highlights search matches as you type.
 vim.opt.termguicolors = true                                                                    -- Enables color.
 vim.opt.scrolloff = 8                                                                           -- Keeps 8 lines between cursor and window edge while scrolling.
-vim.opt.signcolumn =
-"yes"                                                                                           -- Always show the sign column.
+vim.opt.signcolumn = "yes"                                                                      -- Always show the sign column.
 vim.opt.updatetime = 50                                                                         -- Sets the time (in ms) that triggers CursorHold event.
 vim.api.nvim_create_autocmd("InsertEnter", { pattern = '*', command = 'set norelativenumber' }) -- Relative line numbers in insert mode
 vim.api.nvim_create_autocmd("InsertLeave", { pattern = '*', command = 'set relativenumber' })   -- Disable relative line when leaving insert
@@ -163,7 +168,7 @@ vim.keymap.set("n", "<C-d>", "<C-d>zz")                                         
 vim.keymap.set("n", "<C-u>", "<C-u>zz")                                                         -- Keep cursor in middle when going down
 vim.keymap.set("n", "n", "nzzzv")                                                               -- Keep cursor in middle when searching
 vim.keymap.set("n", "N", "Nzzzv")                                                               -- Keep cursor in middle when searching
-vim.keymap.set("n", "<leader>h", ":noh")                                                        -- Unhighlight find selections
+vim.keymap.set("n", "<leader>h", "<cmd>noh<CR>")                                                -- Unhighlight find selections
 vim.keymap.set({ "n", "v", "x" }, "<leader>p", [["_dP]])                                        -- System clipboard paste
 vim.keymap.set({ "n", "v", "x" }, "<leader>y", [["+y]])                                         -- System clipboard yank
 vim.keymap.set({ "n", "v", "x" }, "<leader>Y", [["+Y]])                                         -- System clipboard yank current line
@@ -193,7 +198,6 @@ require("luasnip")
 local treesitter_parser_config = require("nvim-treesitter.parsers").get_parser_configs()
 local cmp = require('cmp')
 local lsp_zero = require("lsp-zero")
-local lspconfig = require("lspconfig")
 capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
 
 require("mason-lspconfig").setup({ handlers = { lsp_zero.default_setup } })
@@ -211,13 +215,27 @@ cmp.setup({
     }),
 })
 
+
 local custom_format = function()
     if vim.bo.filetype == "astro" then
-        local cmd = "silent !prettier --write " .. vim.fn.shellescape(vim.api.nvim_buf_get_name(0))
+        local cmd = "silent !prettier --write --experimental-ternaries " .. vim.fn.shellescape(vim.api.nvim_buf_get_name(0))
         vim.cmd(cmd)
-    elseif vim.bo.filetype == "templ" then -- Templ files default formatting doesn't use the templ fmt command. Possibly because there are five (5!) lsps attached to the buffer
-        local cmd = "silent !templ fmt " .. vim.fn.shellescape(vim.api.nvim_buf_get_name(0))
+    elseif vim.bo.filetype == "rust" then
+        local cmd = "silent !cargo fmt -- " .. vim.fn.shellescape(vim.api.nvim_buf_get_name(0))
         vim.cmd(cmd)
+    elseif vim.bo.filetype == "templ" then
+        local bufnr = vim.api.nvim_get_current_buf()
+        local filename = vim.api.nvim_buf_get_name(bufnr)
+        local cmd = "templ fmt " .. vim.fn.shellescape(filename)
+
+        vim.fn.jobstart(cmd, {
+            on_exit = function()
+                -- Reload the buffer only if it's still the current buffer
+                if vim.api.nvim_get_current_buf() == bufnr then
+                    vim.cmd('e!')
+                end
+            end,
+        })
     else
         vim.lsp.buf.format()
     end
@@ -270,6 +288,14 @@ local on_attach_with_2_space_tabs = function(client, bufnr)
     require("illuminate").on_attach(client)
 end
 
+vim.filetype.add({ extension = { templ = "templ" } })
+vim.filetype.add({ extension = { mdx = "mdx" } })
+vim.treesitter.language.register("markdown", "mdx")
+
+
+local lspconfig = require("lspconfig")
+local lspconfig_utils = require("lspconfig.util")
+
 -- LSPs! --
 lspconfig.html.setup({
     on_attach = on_attach_with_2_space_tabs,
@@ -282,7 +308,21 @@ lspconfig.templ.setup({
     capabilities = capabilities,
 })
 
-vim.filetype.add({ extension = { templ = "templ" } })
+lspconfig.rust_analyzer.setup({
+    on_attach = on_attach,
+    capabilities = capabilities,
+    filetypes = { "rust" },
+    root_dir = lspconfig_utils.root_pattern("Cargo.toml"),
+    settings = {
+        ['rust_analyzer'] = {
+            cargo = {
+                allFeatures = true
+            }
+        }
+    }
+
+})
+
 vim.api.nvim_create_autocmd("BufEnter", {
     pattern = "*.templ",
     callback = function() vim.cmd("TSBufEnable highlight") end
@@ -292,6 +332,13 @@ lspconfig.htmx.setup({
     on_attach = on_attach_with_2_space_tabs,
     capabilities = capabilities,
     filetypes = { "html", "templ" },
+})
+
+lspconfig.tailwindcss.setup({
+    on_attach = on_attach_with_2_space_tabs,
+    capabilities = capabilities,
+    filetypes = { "templ", "astro", "javascript", "typescript", "react" },
+    init_options = { userLanguages = { templ = "html" } },
 })
 
 lspconfig.tsserver.setup({
@@ -309,12 +356,6 @@ vim.cmd [[
 let g:astro_typescript = 'enable'
 ]]
 
-lspconfig.tailwindcss.setup({
-    on_attach = on_attach_with_2_space_tabs,
-    capabilities = capabilities,
-    filetypes = { "templ", "astro", "javascript", "typescript", "react" },
-    init_options = { userLanguages = { templ = "html" } },
-})
 
 lspconfig.gopls.setup({
     on_attach = on_attach,
@@ -360,7 +401,7 @@ lspconfig.lua_ls.setup({
     settings = {
         Lua = {
             diagnostics = { enable = false },
-            workspace = { checkThirdParty = false } -- Disabled because libraries don't make the optional parts of config optional in the type system. }
+            workspace = { checkThirdParty = false } -- Disabled because libraries don't make the optional parts of config optional in the type system. 
         }
     }
 })
