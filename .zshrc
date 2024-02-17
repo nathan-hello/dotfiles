@@ -32,10 +32,31 @@ plugins=(git)
 unsetopt AUTO_CD
 alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME"
 alias la="exa -lah --header"
-alias mpvc='mpv --sub-align-x=center --sub-font="Arial" --sub-font-size=36 --sub-color="#FFFFFF" --sub-border-color="#000000" --sub-shadow-color="#000000" --sub-shadow-offset=1 --sub-ass-force-style="MarginL=512,MarginR=512"'
+alias mpvc='mpv \
+    --sub-align-x=center \
+    --sub-font="Arial" \
+    --sub-font-size=36 \
+    --sub-color="#FFFFFF" \
+    --sub-border-color="#000000" \
+    --sub-shadow-color="#000000" \
+    --sub-shadow-offset=1 \
+    --sub-ass-force-style="MarginL=512,MarginR=512"'
+export MPV_CUSTOM='mpv \
+    --sub-align-x=center \
+    --sub-font="Arial" \
+    --sub-font-size=36 \
+    --sub-color="#FFFFFF" \
+    --sub-border-color="#000000" \
+    --sub-shadow-color="#000000" \
+    --sub-shadow-offset=1 \
+    --sub-ass-force-style="MarginL=512,MarginR=512"'
 alias flogout="pkill -KILL -u $(whoami)"
 alias ds="docker stop $(docker ps -aq)"
 alias sqlcc="DB_URI=$DB_URI sqlc"
+
+alias rm='echo -e "ERR: use trash instead:\n    tr <file or directory>"; false'
+alias tr="trash"
+alias trla="exa -lah --header ~/.local/share/Trash/files"
 
 export EDITOR=nvim
 
