@@ -75,3 +75,6 @@ export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 # bun completions
 [ -s "/home/nate/.bun/_bun" ] && source "/home/nate/.bun/_bun"
+
+# Turso
+export PATH="/home/nate/.turso:$PATH"
