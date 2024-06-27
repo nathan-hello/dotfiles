@@ -32,49 +32,43 @@ plugins=(git)
 unsetopt AUTO_CD
 alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME"
 alias la="exa -lah --header"
-alias mpvc='mpv \
-    --sub-align-x=center \
-    --sub-font="Arial" \
-    --sub-font-size=36 \
-    --sub-color="#FFFFFF" \
-    --sub-border-color="#000000" \
-    --sub-shadow-color="#000000" \
-    --sub-shadow-offset=1 \
-    --sub-ass-force-style="MarginL=512,MarginR=512"'
-export MPV_CUSTOM='mpv \
-    --sub-align-x=center \
-    --sub-font="Arial" \
-    --sub-font-size=36 \
-    --sub-color="#FFFFFF" \
-    --sub-border-color="#000000" \
-    --sub-shadow-color="#000000" \
-    --sub-shadow-offset=1 \
-    --sub-ass-force-style="MarginL=512,MarginR=512"'
 alias flogout="pkill -KILL -u $(whoami)"
 alias ds="docker stop $(docker ps -aq)"
-alias sqlcc="DB_URI=$DB_URI sqlc"
-
-alias rm='echo -e "ERR: use trash instead:\n    tr <file or directory>"; false'
-alias tr="trash"
+alias rm='echo -e "ERR: use trash instead:\n    tm <file or directory>"; false'
+alias tm="trash"
 alias trla="exa -lah --header ~/.local/share/Trash/files"
 
 export EDITOR=nvim
 
-mkdir -p $HOME/programs/go
-export GOPATH=$HOME/programs/go
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+[ -s "/home/nate/.bun/_bun" ] && source "/home/nate/.bun/_bun" # bun completions
 
+# go
+export GOPATH=$HOME/programs/go
 export PATH=$GOPATH/bin:$PATH
+[[ -s "/home/nate/.gvm/scripts/gvm" ]] && source "/home/nate/.gvm/scripts/gvm" # https://github.com/moovweb/gvm
+
 export PATH=/usr/local/go/bin:$PATH
 export PATH=$HOME/bin:/usr/local/bin:$PATH
 export PATH=$HOME/.cargo/bin:$PATH
 export PATH=$HOME/.local/bin:$PATH
 export PATH=$HOME/.local/bin/dwmblocks:$PATH
-
-# bun
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
-# bun completions
-[ -s "/home/nate/.bun/_bun" ] && source "/home/nate/.bun/_bun"
-
-# Turso
 export PATH="/home/nate/.turso:$PATH"
+export PATH="/snap/bin:$PATH"
+
+
+# Use vim keys in tab complete menu:
+bindkey -M menuselect 'h' vi-backward-char
+bindkey -M menuselect 'k' vi-up-line-or-history
+bindkey -M menuselect 'l' vi-forward-char
+bindkey -M menuselect 'j' vi-down-line-or-history
+
+bindkey "^A" beginning-of-line
+bindkey "^E" end-of-line
+bindkey "^B" backward-word 
+bindkey "^F" forward-word
+bindkey "^[[P" delete-char
+bindkey '^H' backward-delete-word
+

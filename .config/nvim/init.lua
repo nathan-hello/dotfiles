@@ -26,7 +26,7 @@ require("lazy").setup({
   },
   {
     "kyazdani42/nvim-tree.lua",
-    opts = { view = { side = "right" }, git = { enable = true, ignore = false, timeout = 500 } },
+    opts = { view = { side = "right" }, git = { enable = true, ignore = true, timeout = 500 } },
   },
   { "JoosepAlviste/nvim-ts-context-commentstring", opts = {} },
   { -- Comments!
@@ -76,7 +76,7 @@ require("lazy").setup({
             "rg",
             "--files",
             "--hidden",           -- make :Telescope find_files find hidden files
-            "--no-ignore",        -- make :Telescope find_files not respect gitignore
+            -- "--no-ignore",        -- make :Telescope find_files not respect gitignore 
             "--glob",
             "!**/.git/*",         -- But it still won't look inside of these folders
             "--glob",
@@ -169,7 +169,7 @@ require("lazy").setup({
               vim.cmd("silent !cargo fmt -- " .. vim.fn.shellescape(vim.api.nvim_buf_get_name(0)))
             end,
             templ = function()
-              vim.cmd("!templ fmt -- " .. vim.fn.shellescape(vim.api.nvim_buf_get_name(0)))
+              vim.cmd("silent !templ fmt -- " .. vim.fn.shellescape(vim.api.nvim_buf_get_name(0)))
             end,
           }
 
@@ -232,6 +232,7 @@ require("lazy").setup({
           init_options = { userLanguages = { templ = "html" } },
         },
         astro = {},
+        prettier = {},
         templ = {},
         clangd = {},
         gopls = {
@@ -527,10 +528,11 @@ vim.keymap.set("n", "<C-1>", "<cmd>1wincmd w<CR>", { desc = "Move focus to windo
 vim.keymap.set("n", "<C-2>", "<cmd>2wincmd w<CR>", { desc = "Move focus to window 2" })
 vim.keymap.set("n", "<C-3>", "<cmd>3wincmd w<CR>", { desc = "Move focus to window 3" })
 vim.keymap.set("n", "<C-4>", "<cmd>4wincmd w<CR>", { desc = "Move focus to window 4" })
-vim.keymap.set("n", "<C-0>", "<Cmd>NvimTreeFocus<CR>", { desc = "Focus NvimTree" })
-vim.keymap.set("n", "<C-)>", "<Cmd>NvimTreeClose<CR>", { desc = "Close NvimTree" })
-vim.keymap.set("n", "<C-_>", "<cmd>vertical resize -16<CR>", { desc = "Shrink window" })
-vim.keymap.set("n", "<C-+>", "<cmd>vertical resize +16<CR>", { desc = "Grow window" })
+vim.keymap.set("n", "<leader>0", "<Cmd>NvimTreeFocus<CR>", { desc = "Focus NvimTree" })
+vim.keymap.set("n", "<leader>)", "<Cmd>NvimTreeClose<CR>", { desc = "Close NvimTree" })
+vim.keymap.set("n", "<leader>-", "<cmd>vertical resize -16<CR>", { desc = "Shrink window" })
+vim.keymap.set("n", "<leader>=", "<cmd>vertical resize +16<CR>", { desc = "Grow window" })
+vim.keymap.set("n", "<leader>tt", "<Cmd>TroubleToggle<CR>", { desc = "Focus Troble" })
 
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move selection up" })
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move selection down" })
@@ -588,8 +590,7 @@ vim.api.nvim_create_autocmd("BufWritePre", {
         end
       end
     end
-    require("conform").format() -- Using conform to format
-    -- vim.lsp.buf.format({ async = false })
+    vim.lsp.buf.format({ async = false })
   end,
 })
 
