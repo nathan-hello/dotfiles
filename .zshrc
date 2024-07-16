@@ -31,9 +31,9 @@ plugins=(git)
 
 unsetopt AUTO_CD
 alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME"
-alias la="exa -lah --header"
+alias la="exa -lah --header --group-directories-first --sort name"
 alias flogout="pkill -KILL -u $(whoami)"
-alias ds="docker stop $(docker ps -aq)"
+# alias ds="docker stop $(docker ps -aq)"
 alias rm='echo -e "ERR: use trash instead:\n    tm <file or directory>"; false'
 alias tm="trash"
 alias trla="exa -lah --header ~/.local/share/Trash/files"
