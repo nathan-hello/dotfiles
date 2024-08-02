@@ -1,5 +1,10 @@
 #.git is not in this folder but is aliased to 'dotfiles'
 
+# Ignore binary files (catchall)
+*
+# Uningore files with an extension (following rules follow)
+!*.*
+
 # Prerequisites
 *.d
 
