@@ -66,8 +66,8 @@ static const Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
-    { MODKEY,                       XK_b,      togglebar,      {0} },
-    { MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
+        { MODKEY,                       XK_b,      togglebar,      {0} },
+        { MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
 	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },
 	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },
@@ -78,13 +78,13 @@ static const Key keys[] = {
     // Hardcode XK_comma to monitor 0, XK_period to monitor 1. 
     // Disabled because sometimes which monitor is which can change.
 	// { MODKEY,                    XK_comma,  focusmon,       {.i = 0 } },  // always monitor 0
-	// { MODKEY|ShiftMask,          XK_comma,  tagmon,         {.i = 0 } },  // always monitor 0
+	{ MODKEY|ShiftMask,          XK_comma,  tagmon,         {.i = 0 } },  // always monitor 0
 	// { MODKEY,                    XK_period, focusmon,       {.i = 1 } },  // always monitor 1
 	// { MODKEY|ShiftMask,          XK_period, tagmon,         {.i = 1 } },  // always monitor 1
 	{ MODKEY|ShiftMask,             XK_f,  tagmon,         {.i = +1 } },  // always monitor 0
 	{ MODKEY,                       XK_f, focusmon,       {.i = +1 } },  // always monitor 1
-    { MODKEY|ShiftMask,             XK_s,     spawn,           {.v = printscr }},
-    { MODKEY,                       XK_q,      killclient,     {0} },
+        { MODKEY|ShiftMask,             XK_s,     spawn,           {.v = printscr }},
+        { MODKEY,                       XK_q,      killclient,     {0} },
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)
