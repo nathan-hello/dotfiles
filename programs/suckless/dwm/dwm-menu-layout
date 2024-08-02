@@ -1,0 +1,12 @@
+#!/bin/sh
+
+cat <<EOF | xmenu -i
+[]= Tiled	0
+><> Floating	1
+[M] Monocle	2
+TTT BStack	3
+=== BStackHoriz	4
+|M| Centered master	5
+__| Threadmill	6
+||| Columns	7
+EOF
