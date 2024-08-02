@@ -140,7 +140,7 @@ static Key keys[] = {
 	/* layouts                                                            */
 	{ MOD1,           XK_BackSpace, incnmaster,     {.i =  0}             },
 	/* tagging                                                            */
-	{ MOD1,           XK_Tab,       view,           {.ui = ~0}            },
+	{ MOD1,           XK_Tab,       view,           {0}            },
 	{ MOD2,           XK_0,         tag,            {.ui = ~0}            },
 	TAGKEYS(          XK_1,         0)
 	TAGKEYS(          XK_2,         1)
