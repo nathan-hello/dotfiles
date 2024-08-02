@@ -1,0 +1,10 @@
+#CHANGELOG CITRUS DOWNSTREAM FORK
+v.1.0.1 20210401 - adjusted normal item background color
+v.1.0.0 ________ - fork created with patches
+	- dmenu-border-4.9
+	- dmenu-caseinsnesitive-20200523
+	- dmenu-center-4.8
+	- dmenu-lineheight-5.0
+	- dmenu-mousesupport-5.0
+	- dmenu-numbers-4.9
+	- dmenu-symbols-4.9
