@@ -1,6 +1,7 @@
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 export SHELL="/bin/zsh"
+export TERM="alacritty"
 
 ZSH_THEME="pmcgee" # https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 CASE_SENSITIVE="false" # use case-sensitive completion
@@ -31,7 +32,8 @@ plugins=(git)
 
 unsetopt AUTO_CD
 alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME"
-alias la="exa -lah --header --group-directories-first --sort name"
+alias ls="exa -lh --header --group-directories-first --sort Name"
+alias la="exa -lah --header --group-directories-first --sort Name"
 alias flogout="pkill -KILL -u $(whoami)"
 # alias ds="docker stop $(docker ps -aq)"
 alias rm='echo -e "ERR: use trash instead:\n    tm <file or directory>"; false'
@@ -48,6 +50,7 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 # go
 export GOPATH=$HOME/programs/go
 export PATH=$GOPATH/bin:$PATH
+export PATH=$HOME/go/bin:$PATH
 [[ -s "/home/nate/.gvm/scripts/gvm" ]] && source "/home/nate/.gvm/scripts/gvm" # https://github.com/moovweb/gvm
 
 export PATH=/usr/local/go/bin:$PATH
