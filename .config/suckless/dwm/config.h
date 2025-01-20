@@ -3,12 +3,12 @@
 /* appearance */
 static const unsigned int borderpx  	= 3;  /* border pixel of windows            */
 static const unsigned int mongap    	= 10; /* gap from monitor sides             */
-static const unsigned int bargap	    = 0; /* gap between bar sections           */
+static const unsigned int bargap	= 0;  /* gap between bar sections           */
 static const unsigned int gappx     	= 10; /* gaps between windows               */
-static const int vertpad   	    	    = 10; /* vertical padding of bar            */
-static const int sidepad	 	        = 10; /* horizontal padding of bar          */
-static const int horizpadbar		    = 3;  /* horizontal internal padding of bar */
-static const int vertpadbar		        = 10; /* vertical internal padding of bar   */
+static const int vertpad   	    	= 0;  /* vertical padding of bar            */
+static const int sidepad	 	= 0;  /* horizontal padding of bar          */
+static const int horizpadbar		= 3;  /* horizontal internal padding of bar */
+static const int vertpadbar		= 10; /* vertical internal padding of bar   */
 
 static const unsigned int snap      	= 8;  /* snap pixel                         */
 static const int showbar            	= 1;  /* 0 means no bar                     */

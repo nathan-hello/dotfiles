@@ -7,3 +7,5 @@
 [user]
 	email = natey3k@gmail.com
 	name = nate
+[init]
+	defaultBranch = main
