@@ -1,6 +1,7 @@
 export ZSH="$HOME/.oh-my-zsh"
 export SHELL="/bin/zsh"
 export TERM="alacritty"
+export BROWSER="firefox"
 
 ZSH_THEME="pmcgee" # https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 CASE_SENSITIVE="false" # use case-sensitive completion
@@ -37,6 +38,8 @@ alias ls="exa -lh --header --group-directories-first --sort Name"
 alias la="exa -lah --header --group-directories-first --sort Name"
 alias flogout="pkill -KILL -u $(whoami)"
 
+alias toby="sudo mount -t nfs 192.168.1.6:/mnt /mnt/toby && cd /mnt/toby"
+
 alias snen="cd /etc/nixos && sudo nvim -u /etc/nixos/dirty/nvim/init.lua ."
 alias snrs="sudo nixos-rebuild switch"
 alias snrt="sudo nixos-rebuild test"
@@ -48,12 +51,17 @@ export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 [ -s "/home/nate/.bun/_bun" ] && source "/home/nate/.bun/_bun" # bun completions
 
+# zig
+export ZVM_PATH="$HOME/.config/zvm"
+export ZVM_INSTALL="$ZVM_PATH/bin"
+
 # go
 export GOPATH=$HOME/programs/go
 export PATH=$GOPATH/bin:$PATH
 export PATH=$HOME/go/bin:$PATH
 [[ -s "/home/nate/.gvm/scripts/gvm" ]] && source "/home/nate/.gvm/scripts/gvm" # https://github.com/moovweb/gvm
 
+export PATH="$ZVM_INSTALL:$PATH"
 export PATH=/usr/local/go/bin:$PATH
 export PATH=$HOME/bin:/usr/local/bin:$PATH
 export PATH=$HOME/.cargo/bin:$PATH
