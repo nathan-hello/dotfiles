@@ -46,6 +46,9 @@ alias snrt="sudo nixos-rebuild test"
 
 export EDITOR=nvim
 
+# c
+export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
+
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
