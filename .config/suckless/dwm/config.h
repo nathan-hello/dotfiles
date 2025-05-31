@@ -100,92 +100,94 @@ static const Layout layouts[] = {
 	/* { MOD2|ShiftMask, KEY, toggletag,  {.ui = 1 << TAG} },
 	{ MOD1|ShiftMask, KEY, toggleview, {.ui = 1 << TAG} }, \ */
 
-#define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
-#define TERMINAL "$TERM"
-#define SCREENSHOT   "flameshot gui"
+#define SHCMD     (cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
+#define SCREENSHOT              "flameshot gui"
 
 /* commands */
-// static const char *terminal[]     = { "$TERM", NULL};
-static const char *dmenu[]        = { "dmenu_run", NULL};
-static const char *webbrowser[]   = { "firefox", NULL};
-static const char *startmenu[]    = { "startmenu.sh", NULL};
-static const char *lock[]         = { "lockscreen.sh", NULL};
-static const char *screenrec[]    = { "scrlive.sh", NULL};
-static const char *boomer[]       = { "boomer", NULL};
-static const char *upvol[]        = { "volup.sh", NULL};
-static const char *downvol[]      = { "voldown.sh", NULL};
-static const char *mutevol[]      = { "mutevol.sh", NULL};
-static const char *brighter[]     = { "brightnessctl set 10%+", NULL};
-static const char *dimmer[]       = { "brightnessctl set 10%-", NULL};
-static const char *layoutmenu_cmd = "dwm-menu-layout";
-static const char *windowmenu_cmd = "dwm-menu-window";
+static const char *terminal[]     = { "$TERM",                                                  NULL};
+static const char *dmenu[]        = { "dmenu_run",                                              NULL};
+static const char *webbrowser[]   = { "$BROWSER",                                               NULL};
+static const char *screenshot[]   = { "flameshot gui",                                          NULL};
+static const char *boomer[]       = { "boomer",                                                 NULL};
+
+static const char *screenrec[]    = { "$HOME/.config/scripts/scrlive.sh",                       NULL};
+static const char *startmenu[]    = { "$HOME/.config/scripts/startmenu.sh",                     NULL};
+static const char *lock[]         = { "$HOME/.config/scripts/lockscreen.sh",                    NULL};
+static const char *upvol[]        = { "$HOME/.config/scripts/volup.sh",                         NULL};
+static const char *downvol[]      = { "$HOME/.config/scripts/voldown.sh",                       NULL};
+static const char *mutevol[]      = { "$HOME/.config/scripts/mutevol.sh",                       NULL};
+static const char *brighter[]     = { "$HOME/.config/scripts/brightnessctl", "set", "10%+",     NULL};
+static const char *dimmer[]       = { "$HOME/.config/scripts/brightnessctl", "set", "10%-",     NULL};
 
 #include "shiftview.c"
 #include <X11/XF86keysym.h>
 
 static Key keys[] = {
-	/* modkey         key           function        argument             */
-    /* processes                                                         */
-	{ MOD1,           XK_Return,    spawn,          SHCMD(TERMINAL)       },
-	{ MOD1,           XK_d,         spawn,          {.v = dmenu}          },
-	{ MOD1,           XK_w,         spawn,          {.v = webbrowser}     },
-	{ 0,              XK_Print,     spawn,           SHCMD(SCREENSHOT)    },
-	{ MOD1|ShiftMask, XK_l,		    spawn,	    	{.v = lock}	          },
-    { 0,		      XK_F9,	    spawn,		    {.v = screenrec}      },
-    { 0,              XF86XK_MonBrightnessUp,   spawn, {.v = brighter}    },
-    { 0,              XF86XK_MonBrightnessDown, spawn, {.v = dimmer}      },
-	{ 0,	          XF86XK_AudioMute, 	    spawn, {.v = mutevol}     },
-	{ 0,              XF86XK_AudioLowerVolume,  spawn, {.v = downvol}     },
-	{ 0,              XF86XK_AudioRaiseVolume,  spawn, {.v = upvol}       },	
-	{ MOD1,           XK_q,         killclient,     {0}                   },
-	{ MOD1|ShiftMask, XK_q,         quit,           {0}                   },
-	{ MOD1,           XK_l,         setmfact,       {.f = +0.05}          },
-	{ MOD1,           XK_h,	        setmfact,       {.f = -0.05}          },
-	{ MOD1,           XK_j,         focusstack,     {.i = +1}             },
-	{ MOD1,           XK_k,         focusstack,     {.i = -1}             },
-	{ MOD1,           XK_z,         focusmaster,    {0}                   },
-    { MOD1|ShiftMask, XK_Return,    zoom,           {0}                   },
-	{ MOD1,           XK_space,     togglefloating, {0}                   },
-	{ MOD1,           XK_t,         togglebar,      {0}                   },
-	{ MOD1,           XK_BackSpace, incnmaster,     {.i =  0}             },
-	{ MOD1,           XK_Tab,       view,           {0}                   },
-	{ MOD2,           XK_l,         setcfact,       {.f = +0.15}          },
-	{ MOD2,           XK_h,         setcfact,       {.f = -0.15}          },
-	{ MOD2,           XK_equal,     setcfact,       {.f =  0.00}          },
-	{ MOD2,           XK_j,         swapdown,       {0}                   },
-	{ MOD2,           XK_k,         swapup,         {0}                   },
-	{ MOD1,           XK_f,         togglefullscr,  {0}                   },
-	{ MOD1,           XK_n,         shiftview,      {.i = +1}             },
-	{ MOD1,           XK_b,         shiftview,      {.i = -1}	          },
-	/* monitors                                                           */
-	{ MOD1,	          XK_period,    focusmon,       {.i = -1}             },
-    { MOD1,	          XK_comma,     focusmon,       {.i = +1}             },
- 	{ MOD1|ShiftMask, XK_comma,     tagmon,         {.i = -1 }            },
- 	{ MOD1|ShiftMask, XK_period,    tagmon,         {.i = +1 }            },
-    { MOD1|ShiftMask, XK_g,         togglegaps,     {0}                   },
-	/* layouts                                                            */
-	{ MOD1,           XK_F1,        setlayout,      {.v = &layouts[0]}    },
-	{ MOD1,           XK_F2,        setlayout,      {.v = &layouts[1]}    },
-	{ MOD1,           XK_F3,        setlayout,      {.v = &layouts[2]}    },
-	{ MOD1,           XK_F4,        setlayout,      {.v = &layouts[3]}    },
-	{ MOD1,           XK_F5,        setlayout,      {.v = &layouts[4]}    },
-	{ MOD1,           XK_F6,        setlayout,      {.v = &layouts[5]}    },
-	{ MOD1,           XK_F7,        setlayout,      {.v = &layouts[6]}    },
-	{ MOD1,           XK_F8,        setlayout,      {.v = &layouts[7]}    },
-	{ MOD1,           XK_equal,     incnmaster,     {.i = +1}             },
-	{ MOD1,           XK_minus,     incnmaster,     {.i = -1}             },
-	{ MOD2,           XK_t,         layoutmenu,     {0}                   },
-	/* tagging                                                            */
-	{ MOD2, XK_0,     tag,            {.ui = ~0}            },
-	TAGKEYS(          XK_1,         0)
-	TAGKEYS(          XK_2,         1)
-	TAGKEYS(          XK_3,         2)
-	TAGKEYS(          XK_4,         3)
-	TAGKEYS(          XK_5,         4)
-	TAGKEYS(          XK_6,         5)
-	TAGKEYS(          XK_7,         6)
-	TAGKEYS(          XK_8,         7)
-	TAGKEYS(          XK_9,         8)
+	/* modkey               key                             function        argument                */
+        /* processes */
+	{ MOD1,                 XK_Return,                      spawn,                          {.v = terminal          },
+	{ MOD1,                 XK_d,                           spawn,                          {.v = dmenu}            },
+	{ MOD1,                 XK_w,                           spawn,                          {.v = webbrowser}       },
+	{ 0,                    XK_Print,                       spawn,                          {.v = screenshot        },
+	{ MOD1|ShiftMask,       XK_l,		                spawn,	    	                {.v = lock}	        },
+        { 0,		        XK_F9,  	                spawn,                          {.v = screenrec}        },
+        { 0,                    XF86XK_MonBrightnessUp,         spawn,                          {.v = brighter}         },
+        { 0,                    XF86XK_MonBrightnessDown,       spawn,                          {.v = dimmer}           },
+	{ 0,	                XF86XK_AudioMute, 	        spawn,                          {.v = mutevol}          },
+	{ 0,                    XF86XK_AudioLowerVolume,        spawn,                          {.v = downvol}          },
+	{ 0,                    XF86XK_AudioRaiseVolume,        spawn,                          {.v = upvol}            },	
+	{ MOD1,                 XK_q,                           killclient,                     {0}                     },
+	{ MOD1|ShiftMask,       XK_q,                           quit,                           {0}                     },
+	{ MOD1,                 XK_l,                           setmfact,                       {.f = +0.05}            },
+	{ MOD1,                 XK_h,	                        setmfact,                       {.f = -0.05}            },
+	{ MOD1,                 XK_j,                           focusstack,                     {.i = +1}               },
+	{ MOD1,                 XK_k,                           focusstack,                     {.i = -1}               },
+	{ MOD1,                 XK_z,                           focusmaster,                    {0}                     },
+        { MOD1|ShiftMask,       XK_Return,                      zoom,                           {0}                     },
+	{ MOD1,                 XK_BackSpace,                   incnmaster,                     {.i =  0}               },
+	{ MOD1,                 XK_Tab,                         view,                           {0}                     },
+	{ MOD2,                 XK_l,                           setcfact,                       {.f = +0.15}            },
+	{ MOD2,                 XK_h,                           setcfact,                       {.f = -0.15}            },
+	{ MOD2,                 XK_equal,                       setcfact,                       {.f =  0.00}            },
+	{ MOD2,                 XK_j,                           swapdown,                       {0}                     },
+	{ MOD2,                 XK_k,                           swapup,                         {0}                     },
+	{ MOD1,                 XK_f,                           togglefullscr,                  {0}                     },
+	// { MOD1,                 XK_space,                       togglefloating,                 {0}                     },
+	// { MOD1,                 XK_n,                           shiftview,                      {.i = +1}               },
+	// { MOD1,                 XK_b,                           shiftview,                      {.i = -1}	           },
+	// { MOD1,                 XK_t,                           togglebar,                      {0}                     },
+
+	/* monitors */
+	// { MOD1,	           XK_period,                      focusmon,                       {.i = -1}               },
+        // { MOD1,	           XK_comma,                       focusmon,                       {.i = +1}               },
+ 	// { MOD1|ShiftMask,       XK_comma,                       tagmon,                         {.i = -1 }              },
+ 	// { MOD1|ShiftMask,       XK_period,                      tagmon,                         {.i = +1 }              },
+        // { MOD1|ShiftMask,       XK_g,                           togglegaps,                     {0}                     },
+
+	/* layouts */
+	// { MOD1,                 XK_F1,                          setlayout,                      {.v = &layouts[0]}      },
+	// { MOD1,                 XK_F2,                          setlayout,                      {.v = &layouts[1]}      },
+	// { MOD1,                 XK_F3,                          setlayout,                      {.v = &layouts[2]}      },
+	// { MOD1,                 XK_F4,                          setlayout,                      {.v = &layouts[3]}      },
+	// { MOD1,                 XK_F5,                          setlayout,                      {.v = &layouts[4]}      },
+	// { MOD1,                 XK_F6,                          setlayout,                      {.v = &layouts[5]}      },
+	// { MOD1,                 XK_F7,                          setlayout,                      {.v = &layouts[6]}      },
+	// { MOD1,                 XK_F8,                          setlayout,                      {.v = &layouts[7]}      },
+	// { MOD1,                 XK_equal,                       incnmaster,                     {.i = +1}               },
+	// { MOD1,                 XK_minus,                       incnmaster,                     {.i = -1}               },
+	// { MOD2,                 XK_t,                           layoutmenu,                     {0}                     },
+	/* tagging */
+	{ MOD2,                 XK_0,                           tag,                            {.ui = ~0}              },
+
+	TAGKEYS(                XK_1,         0)
+	TAGKEYS(                XK_2,         1)
+	TAGKEYS(                XK_3,         2)
+	TAGKEYS(                XK_4,         3)
+	TAGKEYS(                XK_5,         4)
+	TAGKEYS(                XK_6,         5)
+	TAGKEYS(                XK_7,         6)
+	TAGKEYS(                XK_8,         7)
+	TAGKEYS(                XK_9,         8)
 };
 
 /* button definitions */

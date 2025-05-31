@@ -1,21 +1,17 @@
 export ZSH="$HOME/.oh-my-zsh"
 export SHELL="/bin/zsh"
-export TERM="alacritty"
-export BROWSER="firefox"
+export TERM="ghostty"
+export BROWSER="qutebrowser"
+export EDITOR="nvim"
 
 ZSH_THEME="pmcgee" # https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 CASE_SENSITIVE="false" # use case-sensitive completion
 HYPHEN_INSENSITIVE="true" # use hyphen-insensitive completion
-HIST_STAMPS="yyyy-mm-dd" # change the command execution timestamp shown in the history command output
 zstyle ':omz:update' mode disabled  # update mode: disabled | auto | reminder
-source $ZSH/oh-my-zsh.sh
 export LANG=en_US.UTF-8
 
-# DISABLE_MAGIC_FUNCTIONS="true" # Uncomment the following line if pasting URLs and other text is messed up.
-# DISABLE_AUTO_TITLE="true" # Uncomment the following line to disable auto-setting terminal title.
+DISABLE_MAGIC_FUNCTIONS="true" # Uncomment the following line if pasting URLs and other text is messed up.
 # ENABLE_CORRECTION="true" # Uncomment the following line to enable command auto-correction.
-# export MANPATH="/usr/local/man:$MANPATH"
-# export ARCHFLAGS="-arch x86_64"
 
 # Uncomment the following line to display red dots whilst waiting for completion.
 # You can also set it to another string to have that shown instead of the default red dots.
@@ -23,28 +19,26 @@ export LANG=en_US.UTF-8
 # Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
 COMPLETION_WAITING_DOTS="true"
 
-# Which plugins would you like to load?
 # Standard plugins can be found in $ZSH/plugins/
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
 plugins=(git)
 
+function zvm_config() {
+  ZVM_LINE_INIT_MODE=$ZVM_MODE_INSERT
+}
+plugins+=(zsh-vi-mode)
+
+source $ZSH/oh-my-zsh.sh
+
 unsetopt AUTO_CD
-export DISTRO_ID=$(grep -oP '^ID="\K[^"]+' /etc/os-release)
 alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles --work-tree=$HOME"
-alias rm="rm -iv"
+alias rm="rm -rv"
 alias ls="exa -lh --header --group-directories-first --sort Name"
 alias la="exa -lah --header --group-directories-first --sort Name"
 alias flogout="pkill -KILL -u $(whoami)"
 
 alias toby="sudo mount -t nfs 192.168.1.6:/mnt /mnt/toby && cd /mnt/toby"
 
-alias snen="cd /etc/nixos && sudo nvim -u /etc/nixos/dirty/nvim/init.lua ."
-alias snrs="sudo nixos-rebuild switch"
-alias snrt="sudo nixos-rebuild test"
-
-export EDITOR=nvim
 
 # c
 export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
@@ -62,7 +56,7 @@ export ZVM_INSTALL="$ZVM_PATH/bin"
 export GOPATH=$HOME/programs/go
 export PATH=$GOPATH/bin:$PATH
 export PATH=$HOME/go/bin:$PATH
-[[ -s "/home/nate/.gvm/scripts/gvm" ]] && source "/home/nate/.gvm/scripts/gvm" # https://github.com/moovweb/gvm
+export GVM_ROOT=/home/nate/.config/.gvm # https://github.com/moovweb/gvm
 
 export PATH="$ZVM_INSTALL:$PATH"
 export PATH=/usr/local/go/bin:$PATH
@@ -73,16 +67,16 @@ export PATH=$HOME/.local/bin/dwmblocks:$PATH
 export PATH="/home/nate/.turso:$PATH"
 export PATH="/snap/bin:$PATH"
 
+export LOG="$HOME/.log"
+MAXSIZE=$((50 * 1024 * 1024)) # 50 MB
 
-# Use vim keys in tab complete menu:
-bindkey -M menuselect 'h' vi-backward-char
-bindkey -M menuselect 'k' vi-up-line-or-history
-bindkey -M menuselect 'l' vi-forward-char
-bindkey -M menuselect 'j' vi-down-line-or-history
+# Only start logging if not already under script
+if [[ -z "$UNDER_SCRIPT" ]]; then
+  # Rotate if too big
+  if [[ -f $LOG && $(stat -c%s "$LOG") -gt $MAXSIZE ]]; then
+    mv "$LOG" "$LOG.$(date +%Y%m%d%H%M%S)"
+  fi
 
-bindkey "^A" beginning-of-line
-bindkey "^E" end-of-line
-bindkey "^B" backward-word 
-bindkey "^F" forward-word
-bindkey "^[[P" delete-char
-bindkey '^H' backward-delete-word
+  export UNDER_SCRIPT=1
+  exec script -q -f "$LOG"
+fi
