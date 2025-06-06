@@ -56,7 +56,8 @@ export ZVM_INSTALL="$ZVM_PATH/bin"
 export GOPATH=$HOME/programs/go
 export PATH=$GOPATH/bin:$PATH
 export PATH=$HOME/go/bin:$PATH
-export GVM_ROOT=/home/nate/.config/.gvm # https://github.com/moovweb/gvm
+export GVM_ROOT=/home/nate/.gvm # https://github.com/moovweb/gvm
+[[ -s "/home/nate/.gvm/scripts/gvm" ]] && source "/home/nate/.gvm/scripts/gvm" # https://github.com/moovweb/gvm
 
 export PATH="$ZVM_INSTALL:$PATH"
 export PATH=/usr/local/go/bin:$PATH
@@ -66,6 +67,8 @@ export PATH=$HOME/.local/bin:$PATH
 export PATH=$HOME/.local/bin/dwmblocks:$PATH
 export PATH="/home/nate/.turso:$PATH"
 export PATH="/snap/bin:$PATH"
+
+bindkey '^H' backward-delete-word
 
 export LOG="$HOME/.log"
 MAXSIZE=$((50 * 1024 * 1024)) # 50 MB
@@ -80,3 +83,4 @@ if [[ -z "$UNDER_SCRIPT" ]]; then
   export UNDER_SCRIPT=1
   exec script -q -f "$LOG"
 fi
+

@@ -272,7 +272,7 @@ require("lazy").setup({
               runtime = { version = "LuaJIT" },
               workspace = { -- Tells lua_ls where to find all the Lua files that you have loaded for your neovim configuration. If lua_ls is really slow on your computer, you can try this instead: library = { vim.env.VIMRUNTIME },
                 library = {
-                  checkThirdParty = false,
+                  checkThirdParty = true,
                   "${3rd}/luv/library",
                   unpack(vim.api.nvim_get_runtime_file("", true)),
                 },
