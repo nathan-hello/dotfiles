@@ -1,3 +1,5 @@
+#include <string.h>
+#include <stdlib.h>
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
@@ -100,24 +102,63 @@ static const Layout layouts[] = {
 	/* { MOD2|ShiftMask, KEY, toggletag,  {.ui = 1 << TAG} },
 	{ MOD1|ShiftMask, KEY, toggleview, {.ui = 1 << TAG} }, \ */
 
-#define SHCMD     (cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
-#define SCREENSHOT              "flameshot gui"
 
-/* commands */
-static const char *terminal[]     = { "$TERM",                                                  NULL};
-static const char *dmenu[]        = { "dmenu_run",                                              NULL};
-static const char *webbrowser[]   = { "$BROWSER",                                               NULL};
-static const char *screenshot[]   = { "flameshot gui",                                          NULL};
-static const char *boomer[]       = { "boomer",                                                 NULL};
 
-static const char *screenrec[]    = { "$HOME/.config/scripts/scrlive.sh",                       NULL};
-static const char *startmenu[]    = { "$HOME/.config/scripts/startmenu.sh",                     NULL};
-static const char *lock[]         = { "$HOME/.config/scripts/lockscreen.sh",                    NULL};
-static const char *upvol[]        = { "$HOME/.config/scripts/volup.sh",                         NULL};
-static const char *downvol[]      = { "$HOME/.config/scripts/voldown.sh",                       NULL};
-static const char *mutevol[]      = { "$HOME/.config/scripts/mutevol.sh",                       NULL};
-static const char *brighter[]     = { "$HOME/.config/scripts/brightnessctl", "set", "10%+",     NULL};
-static const char *dimmer[]       = { "$HOME/.config/scripts/brightnessctl", "set", "10%-",     NULL};
+static char terminal_cmd[PATH_MAX];
+static char webbrowser_cmd[PATH_MAX];
+// static char dmenu_cmd[PATH_MAX];
+// static char screenshot_cmd[PATH_MAX];
+// static char boomer_cmd[PATH_MAX];
+
+static char scrlive_cmd[PATH_MAX];
+static char startmenu_cmd[PATH_MAX];
+static char lock_cmd[PATH_MAX];
+static char upvol_cmd[PATH_MAX];
+static char downvol_cmd[PATH_MAX];
+static char mutevol_cmd[PATH_MAX];
+static char brighter_cmd[PATH_MAX];
+static char dimmer_cmd[PATH_MAX];
+static char windowmenu_script[PATH_MAX];
+static char layoutmenu_script[PATH_MAX];
+
+static const char *terminal[]       = { terminal_cmd,                NULL };
+static const char *webbrowser[]     = { webbrowser_cmd,              NULL };
+static const char *dmenu[]          = { "dmenu_run",                 NULL };
+static const char *screenshot[]     = { "flameshot", "gui",          NULL };
+static const char *boomer[]         = { "boomer",                    NULL };
+
+static const char *screenrec[]      = { scrlive_cmd,                 NULL };
+static const char *startmenu[]      = { startmenu_cmd,               NULL };
+static const char *lock[]           = { lock_cmd,                    NULL };
+static const char *upvol[]          = { upvol_cmd,                   NULL };
+static const char *downvol[]        = { downvol_cmd,                 NULL };
+static const char *mutevol[]        = { mutevol_cmd,                 NULL };
+static const char *brighter[]       = { brighter_cmd, "set", "10%+", NULL };
+static const char *dimmer[]         = { dimmer_cmd,  "set", "10%-",  NULL };
+static const char *windowmenu_cmd = windowmenu_script;
+static const char *layoutmenu_cmd = layoutmenu_script;
+
+__attribute__((constructor)) 
+void setup_commands() {
+    const char* home    = getenv("HOME");
+    const char* term    = getenv("TERM");
+    const char* browser = getenv("BROWSER");
+    if (!home) return;
+
+    snprintf(terminal_cmd,       sizeof(terminal_cmd),        "%s",                                      term);
+    snprintf(webbrowser_cmd,     sizeof(webbrowser_cmd),      "%s",                                   browser);
+
+    snprintf(scrlive_cmd,        sizeof(scrlive_cmd),        "%s/.config/scripts/scrlive.sh",            home);
+    snprintf(startmenu_cmd,      sizeof(startmenu_cmd),      "%s/.config/scripts/startmenu.sh",          home);
+    snprintf(lock_cmd,           sizeof(lock_cmd),           "%s/.config/scripts/lockscreen.sh",         home);
+    snprintf(upvol_cmd,          sizeof(upvol_cmd),          "%s/.config/scripts/volup.sh",              home);
+    snprintf(downvol_cmd,        sizeof(downvol_cmd),        "%s/.config/scripts/voldown.sh",            home);
+    snprintf(mutevol_cmd,        sizeof(mutevol_cmd),        "%s/.config/scripts/mutevol.sh",            home);
+    snprintf(brighter_cmd,       sizeof(brighter_cmd),       "%s/.config/scripts/brightnessctl",         home);
+    snprintf(dimmer_cmd,         sizeof(dimmer_cmd),         "%s/.config/scripts/brightnessctl",         home);
+    snprintf(windowmenu_script,  sizeof(windowmenu_script),  "%s/.config/scripts/dwm-menu-window.sh",    home);
+    snprintf(layoutmenu_script,  sizeof(layoutmenu_script),  "%s/.config/scripts/dwm-menu-layout.sh",    home);
+}
 
 #include "shiftview.c"
 #include <X11/XF86keysym.h>
@@ -125,10 +166,10 @@ static const char *dimmer[]       = { "$HOME/.config/scripts/brightnessctl", "se
 static Key keys[] = {
 	/* modkey               key                             function        argument                */
         /* processes */
-	{ MOD1,                 XK_Return,                      spawn,                          {.v = terminal          },
+	{ MOD1,                 XK_Return,                      spawn,                          {.v = terminal}         },
 	{ MOD1,                 XK_d,                           spawn,                          {.v = dmenu}            },
 	{ MOD1,                 XK_w,                           spawn,                          {.v = webbrowser}       },
-	{ 0,                    XK_Print,                       spawn,                          {.v = screenshot        },
+	{ 0,                    XK_Print,                       spawn,                          {.v = screenshot}       },
 	{ MOD1|ShiftMask,       XK_l,		                spawn,	    	                {.v = lock}	        },
         { 0,		        XK_F9,  	                spawn,                          {.v = screenrec}        },
         { 0,                    XF86XK_MonBrightnessUp,         spawn,                          {.v = brighter}         },
@@ -143,9 +184,7 @@ static Key keys[] = {
 	{ MOD1,                 XK_j,                           focusstack,                     {.i = +1}               },
 	{ MOD1,                 XK_k,                           focusstack,                     {.i = -1}               },
 	{ MOD1,                 XK_z,                           focusmaster,                    {0}                     },
-        { MOD1|ShiftMask,       XK_Return,                      zoom,                           {0}                     },
-	{ MOD1,                 XK_BackSpace,                   incnmaster,                     {.i =  0}               },
-	{ MOD1,                 XK_Tab,                         view,                           {0}                     },
+        { MOD1|ShiftMask,       XK_Return,                      zoom,                           {0}                     }, { MOD1,                 XK_BackSpace,                   incnmaster,                     {.i =  0}               }, { MOD1,                 XK_Tab,                         view,                           {0}                     },
 	{ MOD2,                 XK_l,                           setcfact,                       {.f = +0.15}            },
 	{ MOD2,                 XK_h,                           setcfact,                       {.f = -0.15}            },
 	{ MOD2,                 XK_equal,                       setcfact,                       {.f =  0.00}            },
@@ -205,8 +244,8 @@ static Button buttons[] = {
 	{ ClkWinTitle,   0,       Button1, windowmenu,     {0}              },
 	{ ClkWinTitle,   0,       Button3, zoom,           {0}              },
 	/* status section, subsections gaps are included in the hitbox      */
-	{ ClkStatusText, 0,       Button3, spawn,          {.v = startmenu} },
-	{ ClkStatusText, 0,       Button3, spawn,          SHCMD(TERMINAL)  },
+	// { ClkStatusText, 0,       Button3, spawn,          {.v = startmenu} },
+	// { ClkStatusText, 0,       Button3, spawn,          SHCMD(TERMINAL)  },
 	/* client windows                                                   */
 	{ ClkClientWin,  MOD1,    Button1, movemouse,      {0}              },
 	{ ClkClientWin,  MOD1,    Button3, windowmenu,     {0}              },
