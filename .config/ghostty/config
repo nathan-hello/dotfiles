@@ -1,0 +1,340 @@
+# https://ghostty.org/docs/config
+
+# ghostty +list-fonts
+#
+# This configuration can be repeated multiple times to specify preferred
+# fallback fonts when the requested codepoint is not available in the primary
+# font. This is particularly useful for multiple languages, symbolic fonts,
+# etc.
+# 
+# Notes on emoji specifically: On macOS, Ghostty by default will always use
+# Apple Color Emoji and on Linux will always use Noto Emoji. You can
+# override this behavior by specifying a font family here that contains
+# emoji glyphs.
+# 
+# The specific styles (bold, italic, bold italic) do not need to be
+# explicitly set. If a style is not set, then the regular style (font-family)
+# will be searched for stylistic variants. If a stylistic variant is not
+# found, Ghostty will use the regular style. This prevents falling back to a
+# different font family just to get a style such as bold. This also applies
+# if you explicitly specify a font family for a style. For example, if you
+# set `font-family-bold = FooBar` and "FooBar" cannot be found, Ghostty will
+# use whatever font is set for `font-family` for the bold style.
+# 
+# Finally, some styles may be synthesized if they are not supported.
+# For example, if a font does not have an italic style and no alternative
+# italic font is specified, Ghostty will synthesize an italic style by
+# applying a slant to the regular style. If you want to disable these
+# synthesized styles then you can use the `font-style` configurations
+# as documented below.
+# 
+# You can disable styles completely by using the `font-style` set of
+# configurations. See the documentation for `font-style` for more information.
+# 
+# If you want to overwrite a previous set value rather than append a fallback,
+# specify the value as `""` (empty string) to reset the list and then set the
+# new values. For example:
+# 
+#     font-family = ""
+#     font-family = "My Favorite Font"
+# 
+# Setting any of these as CLI arguments will automatically clear the
+# values set in configuration files so you don't need to specify
+# `--font-family=""` before setting a new value. You only need to specify
+# this within config files if you want to clear previously set values in
+# configuration files or on the CLI if you want to clear values set on the
+# CLI.
+# 
+# Changing this configuration at runtime will only affect new terminals, i.e.
+# new windows, tabs, etc.
+font-family = "Geist Mono Nerd Font"
+
+# Apply a font feature. To enable multiple font features you can repeat
+# this multiple times or use a comma-separated list of feature settings.
+# 
+# The syntax for feature settings is as follows, where `feat` is a feature:
+# 
+#   * Enable features with e.g. `feat`, `+feat`, `feat on`, `feat=1`.
+#   * Disabled features with e.g. `-feat`, `feat off`, `feat=0`.
+#   * Set a feature value with e.g. `feat=2`, `feat = 3`, `feat 4`.
+#   * Feature names may be wrapped in quotes, meaning this config should be
+#     syntactically compatible with the `font-feature-settings` CSS property.
+# 
+# The syntax is fairly loose, but invalid settings will be silently ignored.
+# 
+# The font feature will apply to all fonts rendered by Ghostty. A future
+# enhancement will allow targeting specific faces.
+# 
+# To disable programming ligatures, use `-calt` since this is the typical
+# feature name for programming ligatures. To look into what font features
+# your font has and what they do, use a font inspection tool such as
+# [fontdrop.info](https://fontdrop.info).
+# 
+# To generally disable most ligatures, use `-calt, -liga, -dlig`.
+font-feature = "-calt, -liga, -dlig"
+
+# A theme to use. This can be a built-in theme name, a custom theme
+# name, or an absolute path to a custom theme file. Ghostty also supports
+# specifying a different theme to use for light and dark mode. Each
+# option is documented below.
+# 
+# If the theme is an absolute pathname, Ghostty will attempt to load that
+# file as a theme. If that file does not exist or is inaccessible, an error
+# will be logged and no other directories will be searched.
+# 
+# If the theme is not an absolute pathname, two different directories will be
+# searched for a file name that matches the theme. This is case sensitive on
+# systems with case-sensitive filesystems. It is an error for a theme name to
+# include path separators unless it is an absolute pathname.
+# 
+# The first directory is the `themes` subdirectory of your Ghostty
+# configuration directory. This is `$XDG_CONFIG_DIR/ghostty/themes` or
+# `~/.config/ghostty/themes`.
+# 
+# The second directory is the `themes` subdirectory of the Ghostty resources
+# directory. Ghostty ships with a multitude of themes that will be installed
+# into this directory. On macOS, this list is in the
+# `Ghostty.app/Contents/Resources/ghostty/themes` directory. On Linux, this
+# list is in the `share/ghostty/themes` directory (wherever you installed the
+# Ghostty "share" directory.
+# 
+# To see a list of available themes, run `ghostty +list-themes`.
+# 
+# A theme file is simply another Ghostty configuration file. They share
+# the same syntax and same configuration options. A theme can set any valid
+# configuration option so please do not use a theme file from an untrusted
+# source. The built-in themes are audited to only set safe configuration
+# options.
+# 
+# Some options cannot be set within theme files. The reason these are not
+# supported should be self-evident. A theme file cannot set `theme` or
+# `config-file`. At the time of writing this, Ghostty will not show any
+# warnings or errors if you set these options in a theme file but they will
+# be silently ignored.
+# 
+# Any additional colors specified via background, foreground, palette, etc.
+# will override the colors specified in the theme.
+# 
+# To specify a different theme for light and dark mode, use the following
+# syntax: `light:theme-name,dark:theme-name`. For example:
+# `light:rose-pine-dawn,dark:rose-pine`. Whitespace around all values are
+# trimmed and order of light and dark does not matter. Both light and dark
+# must be specified in this form. In this form, the theme used will be
+# based on the current desktop environment theme.
+# 
+# There are some known bugs with light/dark mode theming. These will
+# be fixed in a future update:
+# 
+#   - macOS: titlebar tabs style is not updated when switching themes.
+# 
+theme = "GruvboxDark"
+
+
+# Sets the default blinking state of the cursor. This is just the default
+# state; running programs may override the cursor style using `DECSCUSR` (`CSI
+# q`).
+# 
+# If this is not set, the cursor blinks by default. Note that this is not the
+# same as a "true" value, as noted below.
+# 
+# If this is not set at all (`null`), then Ghostty will respect DEC Mode 12
+# (AT&T cursor blink) as an alternate approach to turning blinking on/off. If
+# this is set to any value other than null, DEC mode 12 will be ignored but
+# `DECSCUSR` will still be respected.
+# 
+# Valid values are:
+# 
+#   * ` ` (blank)
+#   * `true`
+#   * `false`
+# 
+cursor-style-blink = false
+
+
+cursor-style = block
+shell-integration-features = no-cursor
+
+# Key bindings. The format is `trigger=action`. Duplicate triggers will
+# overwrite previously set values. The list of actions is available in
+# the documentation or using the `ghostty +list-actions` command.
+
+# all of these are handled by dwm - nate (may 2025)
+# keybind = ctrl+page_down=next_tab
+# keybind = ctrl+alt+up=goto_split:up
+# keybind = super+ctrl+shift+plus=equalize_splits
+# keybind = super+ctrl+right_bracket=goto_split:next
+# keybind = ctrl+shift+o=new_split:right
+# keybind = super+ctrl+shift+up=resize_split:up,10
+# keybind = ctrl+alt+left=goto_split:left
+# keybind = super+ctrl+shift+left=resize_split:left,10
+# keybind = ctrl+alt+down=goto_split:down
+# keybind = super+ctrl+shift+down=resize_split:down,10
+# keybind = super+ctrl+shift+right=resize_split:right,10
+# keybind = ctrl+shift+e=new_split:down
+# keybind = ctrl+alt+right=goto_split:right
+# keybind = ctrl+shift+enter=toggle_split_zoom
+# keybind = super+ctrl+left_bracket=goto_split:previous
+# keybind = alt+one=goto_tab:1
+# keybind = alt+two=goto_tab:2
+# keybind = alt+three=goto_tab:3
+# keybind = alt+four=goto_tab:4
+# keybind = alt+five=goto_tab:5
+# keybind = alt+six=goto_tab:6
+# keybind = alt+seven=goto_tab:7
+# keybind = alt+eight=goto_tab:8
+# keybind = ctrl+shift+left=previous_tab
+# keybind = ctrl+shift+w=close_tab
+# keybind = ctrl+page_up=previous_tab
+# keybind = ctrl+tab=next_tab
+# keybind = ctrl+shift+right=next_tab
+# keybind = alt+nine=last_tab
+# keybind = ctrl+shift+t=new_tab
+# keybind = ctrl+shift+tab=previous_tab
+# keybind = ctrl+shift+q=quit
+# keybind = ctrl+enter=toggle_fullscreen
+# keybind = alt+f4=close_window
+
+# just kinda cringe idk
+# keybind = ctrl+shift+comma=reload_config
+# keybind = ctrl+comma=open_config
+
+# new window means "make new window with same current dir"
+keybind = ctrl+shift+n=new_window
+
+keybind = shift+up=adjust_selection:up
+keybind = shift+left=adjust_selection:left
+keybind = shift+right=adjust_selection:right
+keybind = shift+down=adjust_selection:down
+
+keybind = ctrl+plus=increase_font_size:1
+keybind = ctrl+equal=increase_font_size:1
+keybind = ctrl+minus=decrease_font_size:1
+keybind = ctrl+zero=reset_font_size
+
+keybind = ctrl+shift+j=write_screen_file:paste
+keybind = ctrl+alt+shift+j=write_screen_file:open
+keybind = ctrl+shift+a=select_all
+keybind = ctrl+shift+c=copy_to_clipboard
+keybind = ctrl+insert=copy_to_clipboard
+keybind = shift+insert=paste_from_selection
+keybind = ctrl+shift+v=paste_from_clipboard
+
+keybind = ctrl+shift+page_down=jump_to_prompt:1
+keybind = ctrl+shift+page_up=jump_to_prompt:-1
+keybind = shift+page_up=scroll_page_up
+keybind = shift+page_down=scroll_page_down
+keybind = shift+home=scroll_to_top
+keybind = shift+end=scroll_to_bottom
+
+keybind = ctrl+shift+i=inspector:toggle
+
+# Configure a preference for window decorations. This setting specifies
+# a _preference_; the actual OS, desktop environment, window manager, etc.
+# may override this preference. Ghostty will do its best to respect this
+# preference but it may not always be possible.
+# 
+# Valid values:
+# 
+#   * `none` - All window decorations will be disabled. Titlebar,
+#     borders, etc. will not be shown. On macOS, this will also disable
+#     tabs (enforced by the system).
+# 
+#   * `auto` - Automatically decide to use either client-side or server-side
+#     decorations based on the detected preferences of the current OS and
+#     desktop environment. This option usually makes Ghostty look the most
+#     "native" for your desktop.
+# 
+#   * `client` - Prefer client-side decorations.
+# 
+#   * `server` - Prefer server-side decorations. This is only relevant
+#     on Linux with GTK, either on X11, or Wayland on a compositor that
+#     supports the `org_kde_kwin_server_decoration` protocol (e.g. KDE Plasma,
+#     but almost any non-GNOME desktop supports this protocol).
+# 
+#     If `server` is set but the environment doesn't support server-side
+#     decorations, client-side decorations will be used instead.
+# 
+# The default value is `auto`.
+# 
+# For the sake of backwards compatibility and convenience, this setting also
+# accepts boolean true and false values. If set to `true`, this is equivalent
+# to `auto`. If set to `false`, this is equivalent to `none`.
+# This is convenient for users who live primarily on systems that don't
+# differentiate between client and server-side decorations (e.g. macOS and
+# Windows).
+# 
+# The "toggle_window_decorations" keybind action can be used to create
+# a keybinding to toggle this setting at runtime. This will always toggle
+# back to "auto" if the current value is "none" (this is an issue
+# that will be fixed in the future).
+# 
+# Changing this configuration in your configuration and reloading will only affect new windows. Existing windows will not be affected.
+# 
+# macOS: To hide the titlebar without removing the native window borders
+#        or rounded corners, use `macos-titlebar-style = hidden` instead.
+window-decoration = none
+
+# This controls when resize overlays are shown. Resize overlays are a
+# transient popup that shows the size of the terminal while the surfaces are
+# being resized. The possible options are:
+# 
+#   * `always` - Always show resize overlays.
+#   * `never` - Never show resize overlays.
+#   * `after-first` - The resize overlay will not appear when the surface
+#                     is first created, but will show up if the surface is
+#                     subsequently resized.
+# 
+# The default is `after-first`.
+resize-overlay = never
+
+# Whether to automatically copy selected text to the clipboard. `true`
+# will prefer to copy to the selection clipboard, otherwise it will copy to
+# the system clipboard.
+# 
+# The value `clipboard` will always copy text to the selection clipboard
+# as well as the system clipboard.
+# 
+# Middle-click paste will always use the selection clipboard. Middle-click
+# paste is always enabled even if this is `false`.
+# 
+# The default value is true on Linux and macOS.
+copy-on-select = false
+# (double, triple, etc.) or an entirely new single click. A value of zero will
+
+# Whether or not to quit after the last surface is closed.
+# 
+# This defaults to `false` on macOS since that is standard behavior for
+# a macOS application. On Linux, this defaults to `true` since that is
+# generally expected behavior.
+# 
+# On Linux, if this is `true`, Ghostty can delay quitting fully until a
+# configurable amount of time has passed after the last window is closed.
+# See the documentation of `quit-after-last-window-closed-delay`.
+quit-after-last-window-closed = false
+
+# Control the in-app notifications that Ghostty shows.
+# 
+# On Linux (GTK) with Adwaita, in-app notifications show up as toasts. Toasts
+# appear overlaid on top of the terminal window. They are used to show
+# information that is not critical but may be important.
+# 
+# Possible notifications are:
+# 
+#   - `clipboard-copy` (default: true) - Show a notification when text is copied
+#     to the clipboard.
+# 
+# To specify a notification to enable, specify the name of the notification.
+# To specify a notification to disable, prefix the name with `no-`. For
+# example, to disable `clipboard-copy`, set this configuration to
+# `no-clipboard-copy`. To enable it, set this configuration to `clipboard-copy`.
+# 
+# Multiple notifications can be enabled or disabled by separating them
+# with a comma.
+# 
+# A value of "false" will disable all notifications. A value of "true" will
+# enable all notifications.
+# 
+# This configuration only applies to GTK with Adwaita enabled.
+app-notifications = false
+
+confirm-close-surface=false
