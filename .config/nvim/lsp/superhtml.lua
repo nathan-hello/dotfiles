@@ -1,4 +1,4 @@
--- TODO: verify binary exists before starting nvim
+-- https://github.com/kristoff-it/superhtml
 
 ---@type vim.lsp.start.Opts
 local M = {

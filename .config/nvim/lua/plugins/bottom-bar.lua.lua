@@ -12,7 +12,7 @@ local M = {
                         lualine_x = { "searchcount" },
                         lualine_y = {
                                 function() -- Get a list of all LSPs active, and return them in a comma-separated string.
-                                        local clients = vim.lsp.get_active_clients()
+                                        local clients = vim.lsp.get_clients()
                                         if next(clients) == nil then
                                                 return "No LSP"
                                         else
