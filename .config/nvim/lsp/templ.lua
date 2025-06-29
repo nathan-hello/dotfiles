@@ -1,3 +1,5 @@
+-- https://github.com/a-h/templ
+
 local M = {
         cmd = { "templ", "lsp" },
         filetypes = { "templ" },

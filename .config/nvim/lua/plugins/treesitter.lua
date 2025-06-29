@@ -14,9 +14,6 @@ local M = {
                         indent = { enable = true },
                 })
 
-                vim.treesitter.language.register("c", "c")
-                vim.treesitter.language.register("nix", "nix")
-                vim.treesitter.language.register("markdown", "mdx")
         end,
 }
 

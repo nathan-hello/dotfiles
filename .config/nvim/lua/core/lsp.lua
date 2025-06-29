@@ -6,6 +6,9 @@ vim.lsp.enable({
         "templ",
         "superhtml",
         "tailwindcss",
+        "clangd",
+        "htmx",
+        "typescript-language-server",
 })
 
 vim.lsp.config("*", {

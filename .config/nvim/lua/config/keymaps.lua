@@ -1,4 +1,3 @@
-
 -- `:help vim.keymap.set()`
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>") -- Clear search on pressing <Esc> in normal mode
 vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show diagnostic [E]rror messages" })
