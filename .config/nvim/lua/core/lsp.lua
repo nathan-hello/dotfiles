@@ -11,14 +11,16 @@ vim.lsp.enable({
         "typescript-language-server",
 })
 
+local capabilities = vim.tbl_deep_extend(
+        "force",
+        {},
+        vim.lsp.protocol.make_client_capabilities(),
+        require('cmp_nvim_lsp').default_capabilities(),
+        { fileOperations = { didRename = true, willRename = true, }, }
+)
+
 vim.lsp.config("*", {
-        capabilities = vim.tbl_deep_extend(
-                "force",
-                {},
-                vim.lsp.protocol.make_client_capabilities(),
-                require('cmp_nvim_lsp').default_capabilities(),
-                { fileOperations = { didRename = true, willRename = true, }, }
-        ),
+        capabilities = capabilities,
         root_markers = { '.git' },
 })
 
@@ -307,6 +309,23 @@ local function safe_lsp_status()
         local ok, result = pcall(lsp_status_short)
         return ok and result or ""
 end
+
+function StopAllLsps()
+        local clients = vim.lsp.get_clients()
+        if #clients == 0 then
+                print("󰅚 No LSP clients to stop")
+                return
+        end
+        for _, client in ipairs(clients) do
+                vim.lsp.stop_client(client.id)
+        end
+        print("󰄧 Stopped " .. #clients .. " LSP client(s)")
+end
+
+vim.api.nvim_create_user_command('LspStopAll',
+        StopAllLsps
+        , { desc = "Stop all LSP clients in this Neovim session" }
+)
 
 _G.git_branch = safe_git_branch
 _G.lsp_status = safe_lsp_status

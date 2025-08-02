@@ -6,7 +6,6 @@ local M = {
         init_options = {
                 includeLanguages = { templ = "html" }
         },
-
 }
 
 return M
