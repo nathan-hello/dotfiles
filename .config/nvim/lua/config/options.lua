@@ -1,5 +1,5 @@
 -- See `:help vim.opt`. For more options, you can see `:help option-list`
--- vim.opt.clipboard = "unnamedplus" -- Sync clipboard between OS and Neovim. Remove this option if you want your OS clipboard to remain independent. See `:help 'clipboard'`
+vim.opt.clipboard = "unnamedplus" -- Sync clipboard between OS and Neovim. Remove this option if you want your OS clipboard to remain independent. See `:help 'clipboard'`
 vim.opt.number = true        -- alternatively, vim.opt.relativenumber = true
 vim.opt.mouse = "a"          -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.showmode = false     -- Don't show the mode, since it's already in status line

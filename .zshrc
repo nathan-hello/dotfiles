@@ -42,6 +42,12 @@ alias toby="sudo mount -t nfs 192.168.1.6:/mnt /mnt/toby && cd /mnt/toby"
 
 # c
 export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
+# cuda
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/cuda/cuda12.2.2/lib64
+export PATH=$PATH:/opt/cuda/cuda12.2.2/bin
+export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/opt/cuda/cuda12.2.2/include
+export C_INCLUDE_PATH=$C_INCLUDE_PATH:/opt/cuda/cuda12.2.2/include
+alias nvcc="nvcc -ccbin /opt/gcc/build/gcc-12.3/bin/gcc"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
