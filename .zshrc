@@ -1,5 +1,12 @@
 export ZSH="$HOME/.oh-my-zsh"
 export SHELL="/bin/zsh"
+
+if [[ "$COLORTERM" == "ghostty" ]]; then
+	export TERM="ghostty"
+elif [[ "$TTY" == "/dev/pts"* ]]; then
+	export TERM="linux"
+fi
+
 export TERM="ghostty"
 export BROWSER="qutebrowser"
 export EDITOR="nvim"
