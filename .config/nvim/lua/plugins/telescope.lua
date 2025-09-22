@@ -32,7 +32,7 @@ return {
 						"--glob",
 						"!**/node_modules/*", -- But not here
                                                 "--glob",
-                                                "*.env*", -- But not here
+                                                "!.env", -- But not here
 					},
 				},
 			},

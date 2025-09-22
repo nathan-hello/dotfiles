@@ -1,14 +1,9 @@
 export ZSH="$HOME/.oh-my-zsh"
 export SHELL="/bin/zsh"
-
-if [[ "$COLORTERM" == "ghostty" ]]; then
-	export TERM="ghostty"
-elif [[ "$TTY" == "/dev/pts"* ]]; then
-	export TERM="linux"
-fi
-
 export TERM="ghostty"
 export BROWSER="qutebrowser"
+
+export PATH="$HOME/programs/neovim/bin:$PATH"
 export EDITOR="nvim"
 
 ZSH_THEME="pmcgee" # https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
@@ -28,7 +23,7 @@ COMPLETION_WAITING_DOTS="true"
 
 # Standard plugins can be found in $ZSH/plugins/
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
-plugins=(git)
+plugins=(git vi-mode)
 
 function zvm_config() {
   ZVM_LINE_INIT_MODE=$ZVM_MODE_INSERT
@@ -96,4 +91,8 @@ if [[ -z "$UNDER_SCRIPT" ]]; then
   export UNDER_SCRIPT=1
   exec script -q -f "$LOG"
 fi
+
+# windows vm
+export fpath=(~/.config/completions/zsh $fpath)
+export PATH="$HOME/.qemu/bin:$PATH"
 

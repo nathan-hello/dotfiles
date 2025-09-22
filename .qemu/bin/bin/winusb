@@ -1,0 +1,171 @@
+#!/bin/bash
+#
+# Attaches/detaches USB devices to a running QEMU VM using host bus:address.
+# This version handles unbinding the device from the host kernel before passthrough.
+#
+# NOTE: This script must be run with 'sudo' to manage kernel drivers.
+#
+
+# Exit immediately if a command exits with a non-zero status.
+set -euo pipefail
+
+# --- Configuration ---
+QMP_SERVER="127.0.0.1:4444"
+QEMU_USB_BUS="xhci.0"
+# --- End Configuration ---
+
+# Function to check for required commands
+check_deps() {
+    if ! command -v qmp-shell &> /dev/null; then
+        echo "Error: 'qmp-shell' not found. Please install it."
+        exit 1
+    fi
+    if ! command -v nc &> /dev/null; then
+        echo "Error: 'nc' (netcat) not found. Please install it."
+        exit 1
+    fi
+}
+
+# Find the sysfs path for a given bus and device number
+find_sysfs_path() {
+    local busnum_dec=$1
+    local devnum_dec=$2
+    for path in /sys/bus/usb/devices/*; do
+        if [ -f "$path/busnum" ] && [ -f "$path/devnum" ]; then
+            if [[ $(<"$path/busnum") -eq "$busnum_dec" && $(<"$path/devnum") -eq "$devnum_dec" ]]; then
+                echo "$path"
+                return 0
+            fi
+        fi
+    done
+    return 1
+}
+
+# Attach a USB device using its Bus and Device number.
+do_attach() {
+    if [ -z "$1" ]; then
+        echo "Error: No device address specified."
+        echo "Usage: sudo $0 attach <bus_num:dev_num>"
+        echo "Find numbers with 'lsusb'. Example: sudo $0 attach 001:005"
+        exit 1
+    fi
+
+    if ! [[ "$1" =~ ^[0-9]{3}:[0-9]{3}$ ]]; then
+        echo "Error: Invalid format. Please use 'bus_num:dev_num' (e.g., 001:005)."
+        exit 1
+    fi
+
+    HOST_BUS=$(echo "$1" | cut -d':' -f1)
+    HOST_ADDR=$(echo "$1" | cut -d':' -f2)
+    HOST_BUS_DEC=$((10#$HOST_BUS))
+    HOST_ADDR_DEC=$((10#$HOST_ADDR))
+    QEMU_DEVICE_ID="usb-host-$HOST_BUS-$HOST_ADDR"
+
+    echo "Finding device sysfs path for $HOST_BUS:$HOST_ADDR..."
+    SYSFS_PATH=$(find_sysfs_path "$HOST_BUS_DEC" "$HOST_ADDR_DEC")
+    if [ -z "$SYSFS_PATH" ]; then
+        echo "Error: Could not find sysfs path for device."
+        exit 1
+    fi
+
+    echo "Unbinding device from host kernel drivers..."
+    for if_path in "$SYSFS_PATH"/*:*; do
+        if [ -d "$if_path" ] && [ -e "$if_path/driver" ]; then
+            DRIVER_NAME=$(basename "$(readlink -f "$if_path/driver")")
+            INTERFACE_ID=$(basename "$if_path")
+            echo "  > Unbinding $INTERFACE_ID from driver $DRIVER_NAME"
+            # This action requires root privileges.
+            echo -n "$INTERFACE_ID" > "/sys/bus/usb/drivers/$DRIVER_NAME/unbind"
+        fi
+    done
+
+    echo "Attaching device to QEMU as '$QEMU_DEVICE_ID'..."
+    # THIS IS THE CORRECTED LINE: Arguments are comma-separated.
+    QMP_CMD="device_add usb-host,hostbus=$HOST_BUS_DEC,hostaddr=$HOST_ADDR_DEC,id=$QEMU_DEVICE_ID,bus=$QEMU_USB_BUS"
+    QMP_OUTPUT=$(qmp-shell -H "$QMP_SERVER" <<< "$QMP_CMD")
+
+    if [[ "$QMP_OUTPUT" == *'"error":'* ]] || [[ "$QMP_OUTPUT" == *"error:"* ]] || [[ "$QMP_OUTPUT" == *"failed"* ]]; then
+        echo "Error: Failed to attach device. QEMU responded:"
+        echo "$QMP_OUTPUT"
+        echo "Attempting to re-bind device to host..."
+        echo -n "${SYSFS_PATH##*/}" > /sys/bus/usb/drivers_probe
+        exit 1
+    else
+        echo "Device attached successfully."
+        echo "To detach, run: sudo $0 detach $QEMU_DEVICE_ID"
+    fi
+}
+
+# Detach a USB device using its QEMU-assigned ID.
+do_detach() {
+    if [ -z "$1" ]; then
+        echo "Error: No device specified for detachment."
+        echo "Usage: sudo $0 detach <qemu_device_id>"
+        echo "Example: sudo $0 detach usb-host-001-005"
+        exit 1
+    fi
+
+    QEMU_DEVICE_ID="$1"
+    echo "Detaching '$QEMU_DEVICE_ID' from VM..."
+    QMP_OUTPUT=$(qmp-shell -H "$QMP_SERVER" <<< "device_del $QEMU_DEVICE_ID")
+
+    if [[ "$QMP_OUTPUT" == *'"error":'* ]]; then
+        echo "Error: Failed to detach device. QEMU responded:"
+        echo "$QMP_OUTPUT"
+        # Don't exit, still try to re-bind
+    else
+        echo "Device detached successfully from VM."
+    fi
+
+    # Re-bind the device to the host kernel
+    echo "Re-binding device to host kernel..."
+    HOST_BUS_ADDR=$(echo "$QEMU_DEVICE_ID" | sed -n 's/^usb-host-\([0-9]\{3\}\)-\([0-9]\{3\}\)$/\1:\2/p')
+    if [ -z "$HOST_BUS_ADDR" ]; then
+        echo "Warning: Could not parse bus:addr from ID '$QEMU_DEVICE_ID'. Please re-plug the device to use it on the host."
+        exit 0
+    fi
+
+    HOST_BUS_DEC=$((10#${HOST_BUS_ADDR%%:*}))
+    HOST_ADDR_DEC=$((10#${HOST_BUS_ADDR##*:}))
+
+    SYSFS_PATH=$(find_sysfs_path "$HOST_BUS_DEC" "$HOST_ADDR_DEC")
+    if [ -n "$SYSFS_PATH" ]; then
+        # This action requires root privileges.
+        echo -n "${SYSFS_PATH##*/}" > /sys/bus/usb/drivers_probe
+        echo "Device re-bound to host."
+    else
+        echo "Warning: Could not find device to re-bind. Please re-plug it to use it on the host."
+    fi
+}
+
+# --- Main Logic ---
+if [ "$(id -u)" -ne 0 ]; then
+    echo "Error: This script must be run as root (using sudo)."
+    exit 1
+fi
+
+if [ $# -lt 1 ]; then
+    echo "Usage: sudo $0 {attach|detach} [arguments]"
+    exit 1
+fi
+
+check_deps
+
+if ! nc -z "${QMP_SERVER%%:*}" "${QMP_SERVER##*:}"; then
+    echo "Error: Cannot connect to QMP server at '$QMP_SERVER'."
+    echo "Is the VM running (started with sudo)?"
+    exit 1
+fi
+
+ACTION="$1"
+shift
+
+case "$ACTION" in
+    attach) do_attach "$@" ;;
+    detach) do_detach "$@" ;;
+    *)
+        echo "Error: Invalid action '$ACTION'."
+        echo "Usage: sudo $0 {attach|detach}"
+        exit 1
+        ;;
+esac
