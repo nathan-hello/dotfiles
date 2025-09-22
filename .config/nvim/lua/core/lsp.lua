@@ -21,7 +21,8 @@ local capabilities = vim.tbl_deep_extend(
 
 vim.lsp.config("*", {
         capabilities = capabilities,
-        root_markers = { '.git' },
+        -- Remove global root_markers to allow individual LSP configs to set their own
+        -- root_markers = { '.git' },
 })
 
 vim.diagnostic.config({
@@ -59,6 +60,130 @@ vim.api.nvim_create_user_command('LspRestart', function()
                 vim.cmd('edit')
         end, 100)
 end, {})
+
+-- TypeScript-specific restart command
+vim.api.nvim_create_user_command('TsRestart', function()
+        local clients = vim.lsp.get_clients()
+        local ts_clients = {}
+        
+        for _, client in ipairs(clients) do
+                if client.name == "typescript-language-server" then
+                        table.insert(ts_clients, client)
+                end
+        end
+        
+        if #ts_clients == 0 then
+                print("No TypeScript language server found")
+                return
+        end
+        
+        for _, client in ipairs(ts_clients) do
+                vim.lsp.stop_client(client.id)
+        end
+        
+        print("Restarted " .. #ts_clients .. " TypeScript language server(s)")
+        
+        vim.defer_fn(function()
+                vim.cmd('edit')
+        end, 100)
+end, { desc = "Restart TypeScript language server" })
+
+-- Force TypeScript to reload tsconfig.json
+vim.api.nvim_create_user_command('TsReloadConfig', function()
+        local clients = vim.lsp.get_clients()
+        local ts_clients = {}
+        
+        for _, client in ipairs(clients) do
+                if client.name == "typescript-language-server" then
+                        table.insert(ts_clients, client)
+                end
+        end
+        
+        if #ts_clients == 0 then
+                print("No TypeScript language server found")
+                return
+        end
+        
+        local cwd = vim.fn.getcwd()
+        local tsconfig_path = cwd .. "/tsconfig.json"
+        
+        if vim.fn.filereadable(tsconfig_path) == 0 then
+                print("tsconfig.json not found in " .. cwd)
+                return
+        end
+        
+        for _, client in ipairs(ts_clients) do
+                -- Force reload of tsconfig.json
+                client.notify("workspace/didChangeWatchedFiles", {
+                        changes = {
+                                {
+                                        uri = vim.uri_from_fname(tsconfig_path),
+                                        type = 1 -- Created or Changed
+                                }
+                        }
+                })
+                
+                -- Also notify about configuration changes
+                client.notify("workspace/didChangeConfiguration", {
+                        settings = client.config.settings
+                })
+        end
+        
+        print("Forced TypeScript to reload tsconfig.json")
+end, { desc = "Force TypeScript to reload tsconfig.json" })
+
+-- Debug TypeScript configuration
+vim.api.nvim_create_user_command('TsDebug', function()
+        local clients = vim.lsp.get_clients()
+        local ts_clients = {}
+        
+        for _, client in ipairs(clients) do
+                if client.name == "typescript-language-server" then
+                        table.insert(ts_clients, client)
+                end
+        end
+        
+        if #ts_clients == 0 then
+                print("No TypeScript language server found")
+                return
+        end
+        
+        local cwd = vim.fn.getcwd()
+        local tsconfig_path = cwd .. "/tsconfig.json"
+        
+        print("=== TypeScript Debug Info ===")
+        print("Current directory: " .. cwd)
+        print("tsconfig.json path: " .. tsconfig_path)
+        print("tsconfig.json exists: " .. (vim.fn.filereadable(tsconfig_path) == 1 and "YES" or "NO"))
+        
+        if vim.fn.filereadable(tsconfig_path) == 1 then
+                print("tsconfig.json content:")
+                local content = vim.fn.readfile(tsconfig_path)
+                for i, line in ipairs(content) do
+                        print("  " .. i .. ": " .. line)
+                end
+        end
+        
+        print("\nTypeScript clients:")
+        for i, client in ipairs(ts_clients) do
+                print("  Client " .. i .. ":")
+                print("    ID: " .. client.id)
+                print("    Root dir: " .. (client.config.root_dir or "Not set"))
+                print("    Workspace folders: " .. (client.workspace_folders and #client.workspace_folders or 0))
+                if client.workspace_folders then
+                        for _, folder in ipairs(client.workspace_folders) do
+                                print("      - " .. folder.name .. " (" .. folder.uri .. ")")
+                        end
+                end
+        end
+        
+        print("\nCurrent buffer info:")
+        local bufnr = vim.api.nvim_get_current_buf()
+        print("  Buffer: " .. bufnr)
+        print("  File: " .. vim.api.nvim_buf_get_name(bufnr))
+        print("  Filetype: " .. vim.bo.filetype)
+        
+end, { desc = "Debug TypeScript configuration" })
 
 local function lsp_status()
         local bufnr = vim.api.nvim_get_current_buf()

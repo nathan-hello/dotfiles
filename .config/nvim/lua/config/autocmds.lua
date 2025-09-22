@@ -7,19 +7,6 @@ vim.api.nvim_create_autocmd("TextYankPost", {
         end,
 })
 
--- Enable spell checking for certain file types
-vim.api.nvim_create_autocmd(
-        { "BufRead", "BufNewFile" },
-        -- { pattern = { "*.txt", "*.md", "*.tex" }, command = [[setlocal spell<cr> setlocal spelllang=en,de<cr>]] }
-        {
-                pattern = { "*.txt", "*.md", "*.tex" },
-                callback = function()
-                        vim.opt.spell = true
-                        vim.opt.spelllang = "en,de"
-                end,
-        }
-)
-
 -- don't auto comment new line
 -- NATALIE:
 -- vim.api.nvim_create_autocmd("BufEnter", { command = [[set formatoptions-=cro]] })
@@ -42,19 +29,19 @@ vim.api.nvim_command("autocmd VimResized * wincmd =")
 
 local override_formatters = {
         astro = function()
-                vim.cmd("silent !cd " ..
-                        vim.fn.expand('%:p:h') ..
-                        " && prettier --write " .. vim.fn.shellescape(vim.api.nvim_buf_get_name(0))) -- Call prettier binary inside of the directory that I'm in right now (for repo-specific configuration)
+                vim.cmd("silent !cd " .. vim.fn.expand('%:p:h') .. " && prettier --write " .. vim.fn.shellescape(vim.api.nvim_buf_get_name(0))) -- Call prettier binary inside of the directory that I'm in right now (for repo-specific configuration)
         end,
         javascript = function()
-                vim.cmd("silent !cd " ..
-                        vim.fn.expand('%:p:h') ..
-                        " && prettier --write " .. vim.fn.shellescape(vim.api.nvim_buf_get_name(0))) -- Call prettier binary inside of the directory that I'm in right now (for repo-specific configuration)
+                vim.cmd("silent !cd " .. vim.fn.expand('%:p:h') .. " && prettier --write " .. vim.fn.shellescape(vim.api.nvim_buf_get_name(0))) -- Call prettier binary inside of the directory that I'm in right now (for repo-specific configuration)
         end,
         typescript = function()
-                vim.cmd("silent !cd " ..
-                        vim.fn.expand('%:p:h') ..
-                        " && prettier --write " .. vim.fn.shellescape(vim.api.nvim_buf_get_name(0))) -- Call prettier binary inside of the directory that I'm in right now (for repo-specific configuration)
+                vim.cmd("silent !cd " .. vim.fn.expand('%:p:h') .. " && prettier --write " .. vim.fn.shellescape(vim.api.nvim_buf_get_name(0))) -- Call prettier binary inside of the directory that I'm in right now (for repo-specific configuration)
+        end,
+        typescriptreact = function()
+                vim.cmd("silent !cd " .. vim.fn.expand('%:p:h') .. " && prettier --write " .. vim.fn.shellescape(vim.api.nvim_buf_get_name(0))) -- Call prettier binary inside of the directory that I'm in right now (for repo-specific configuration)
+        end,
+        javascriptreact = function()
+                vim.cmd("silent !cd " .. vim.fn.expand('%:p:h') .. " && prettier --write " .. vim.fn.shellescape(vim.api.nvim_buf_get_name(0))) -- Call prettier binary inside of the directory that I'm in right now (for repo-specific configuration)
         end,
         rust = function()
                 vim.cmd("silent !cargo fmt -- " .. vim.fn.shellescape(vim.api.nvim_buf_get_name(0)))
@@ -66,7 +53,8 @@ local override_formatters = {
 
 vim.api.nvim_create_autocmd("LspAttach", {
         callback = function(event)
-                vim.lsp.buf.format = override_formatters[vim.bo.filetype] or vim.lsp.buf.format
+                local original_format = vim.lsp.buf.format
+                vim.lsp.buf.format = override_formatters[vim.bo.filetype] or original_format
 
 
                 local map = function(keys, func, desc)

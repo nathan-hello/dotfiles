@@ -3,8 +3,7 @@ local M = {
         opts = {
                 view = { side = "right" },
                 git = {
-                        enable = true,
-                        timeout = 500
+                        enable = false,
                 }
         },
 }

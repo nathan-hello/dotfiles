@@ -1,0 +1,372 @@
+// Place your key bindings in this file to override the defaultsauto[]
+[
+  //ctrl+alt+e runs python file in focus
+  {
+    "key": "ctrl+alt+e",
+    "command": "python.execInTerminal-icon"
+  },
+  {
+    "key": "tab",
+    "command": "acceptSelectedSuggestion",
+    "when": "acceptSuggestionOnEnter && suggestWidgetHasFocusedSuggestion && suggestWidgetVisible && suggestionMakesTextEdit && textInputFocus"
+  },
+
+  //enter no longer autocompletes intellisense
+  {
+    "key": "enter",
+    "command": "-acceptSelectedSuggestion",
+    "when": "acceptSuggestionOnEnter && suggestWidgetHasFocusedSuggestion && suggestWidgetVisible && suggestionMakesTextEdit && textInputFocus"
+  },
+  // keybinding to make vim yank into system clipboard
+  {
+    "key": "ctrl+shift+y",
+    "command": "vim.remap",
+    "when": "editorTextFocus && vim.active && !inDebugRepl",
+    "args": {
+      "after": ["\"", "+", "y"]
+    }
+  },
+  //ctrl+u does redo, not ctrl+y because of vim reasons
+  {
+    "key": "ctrl+u",
+    "command": "redo"
+  },
+  {
+    "key": "ctrl+y",
+    "command": "-redo"
+  },
+
+  //ctrl+d no longer does these two things for vim reasons
+  {
+    "key": "ctrl+d",
+    "command": "-editor.action.addSelectionToNextFindMatch",
+    "when": "editorFocus"
+  },
+  {
+    "key": "ctrl+d",
+    "command": "-list.focusPageDown",
+    "when": "listFocus && !inputFocus"
+  },
+
+  // remove ctrl + ]/[ so it can be used for indent/outdent
+  {
+    "key": "ctrl+]",
+    "command": "-extension.vim_ctrl+]",
+    "when": "editorTextFocus && vim.active && vim.use<C-]> && !inDebugRepl"
+  },
+  {
+    "key": "ctrl+[",
+    "command": "-extension.vim_ctrl+[",
+    "when": "editorTextFocus && vim.active && vim.use<C-[> && !inDebugRepl"
+  },
+
+  // ctrl + w q closes tab, useful for when :q doesn't work
+  {
+    "key": "ctrl+w q",
+    "command": "workbench.action.closeActiveEditor"
+  },
+
+  // ctrl + w doesn't close a tab
+  {
+    "key": "ctrl+w",
+    "command": "-workbench.action.closeActiveEditor"
+  },
+
+  // p pastes from system clipboard instead of vim buffer
+  {
+    "key": "p",
+    "command": "editor.action.clipboardPasteAction",
+    "when": "vim.mode == 'Visual'"
+  },
+
+  // ctrl + shift + w doesn't close window. this happened once and it was annoying
+  {
+    "key": "ctrl+shift+w",
+    "command": "-workbench.action.closeWindow"
+  },
+
+  // ctrl + j goes to explorer tab
+  // ctrl + shift + e j also opens explorer
+  // ctrl + shift + e m opens problems view
+  // ctrl + shift + e g opens git
+  // ctrl + shift + e h shows the hover text over selection
+  // ctrl + shift + e p opens copilot labs tab
+  {
+    "key": "ctrl+j",
+    "command": "workbench.view.explorer",
+    "when": "viewContainer.workbench.view.explorer.enabled"
+  },
+  {
+    "key": "ctrl+shift+e x",
+    "command": "workbench.view.extensions",
+    "when": "viewContainer.workbench.view.extensions.enabled"
+  },
+  {
+    "key": "ctrl+shift+j",
+    "command": "workbench.view.explorer",
+    "when": "viewContainer.workbench.view.explorer.enabled"
+  },
+  {
+    "key": "ctrl+shift+e m",
+    "command": "workbench.actions.view.problems",
+    "when": "workbench.panel.markers.view.active"
+  },
+  {
+    "key": "ctrl+shift+e p",
+    "command": "workbench.view.extension.copilot-labs"
+  },
+  {
+    "key": "ctrl+shift+e g",
+    "command": "workbench.view.scm",
+    "when": "workbench.scm.active"
+  },
+  {
+    "key": "ctrl+shift+g",
+    "command": "-workbench.view.scm",
+    "when": "workbench.scm.active"
+  },
+  {
+    "key": "shift+h",
+    "command": "editor.action.showHover",
+    "when": "vim.mode == 'Normal'"
+  },
+  {
+    "key": "ctrl+shift+m",
+    "command": "-workbench.actions.view.problems",
+    "when": "workbench.panel.markers.view.active"
+  },
+  {
+    "key": "ctrl+k ctrl+i",
+    "command": "-editor.action.showHover",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+j",
+    "command": "-workbench.action.togglePanel"
+  },
+  {
+    "key": "ctrl+shift+e",
+    "command": "-workbench.view.explorer",
+    "when": "viewContainer.workbench.view.explorer.enabled"
+  },
+  {
+    "key": "ctrl+shift+x",
+    "command": "-workbench.view.extensions",
+    "when": "viewContainer.workbench.view.extensions.enabled"
+  },
+  {
+    "key": "ctrl+k ctrl+shift+w",
+    "command": "-workbench.action.closeAllGroups"
+  },
+  {
+    "key": "ctrl+shift+d",
+    "command": "-workbench.view.debug",
+    "when": "viewContainer.workbench.view.debug.enabled"
+  },
+  {
+    "key": "ctrl+shift+y",
+    "command": "-workbench.debug.action.toggleRepl",
+    "when": "workbench.panel.repl.view.active"
+  },
+  {
+    "key": "ctrl+shift+u",
+    "command": "-workbench.action.output.toggleOutput",
+    "when": "workbench.panel.output.active"
+  },
+  {
+    "key": "ctrl+k ctrl+shift+\\",
+    "command": "-workbench.action.splitEditorInGroup",
+    "when": "activeEditorCanSplitInGroup"
+  },
+  {
+    "key": "ctrl+shift+l",
+    "command": "-addCursorsAtSearchResults",
+    "when": "fileMatchOrMatchFocus && searchViewletVisible"
+  },
+  {
+    "key": "ctrl+shift+h",
+    "command": "-workbench.action.replaceInFiles"
+  },
+  {
+    "key": "ctrl+shift+l",
+    "command": "-selectAllSearchEditorMatches",
+    "when": "inSearchEditor"
+  },
+  {
+    "key": "ctrl+shift+r",
+    "command": "-rerunSearchEditorSearch",
+    "when": "inSearchEditor"
+  },
+  {
+    "key": "ctrl+shift+backspace",
+    "command": "-search.searchEditor.action.deleteFileResults",
+    "when": "inSearchEditor"
+  },
+  {
+    "key": "ctrl+shift+.",
+    "command": "-editor.action.inPlaceReplace.down",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "ctrl+shift+,",
+    "command": "-editor.action.inPlaceReplace.up",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "ctrl+w",
+    "command": "-workbench.action.terminal.killEditor",
+    "when": "terminalEditorFocus && terminalFocus && terminalHasBeenCreated && resourceScheme == 'vscode-terminal' || terminalEditorFocus && terminalFocus && terminalProcessSupported && resourceScheme == 'vscode-terminal'"
+  },
+  {
+    "key": "ctrl+shift+j",
+    "command": "-workbench.action.search.toggleQueryDetails",
+    "when": "inSearchEditor || searchViewletFocus"
+  },
+  {
+    "key": "ctrl+shift+e d",
+    "command": "workbench.view.extension.dockerView"
+  },
+
+  // wipe some more
+  {
+    "key": "ctrl+k",
+    "command": "-extension.vim_ctrl+k",
+    "when": "editorTextFocus && vim.active && vim.use<C-k> && !inDebugRepl"
+  },
+  {
+    "key": "ctrl+p",
+    "command": "-extension.vim_ctrl+p",
+    "when": "editorTextFocus && vim.active && vim.use<C-p> && !inDebugRepl || vim.active && vim.use<C-p> && !inDebugRepl && vim.mode == 'CommandlineInProgress' || vim.active && vim.use<C-p> && !inDebugRepl && vim.mode == 'SearchInProgressMode'"
+  },
+  {
+    "key": "ctrl+p",
+    "command": "-workbench.action.quickOpenNavigateNextInFilePicker",
+    "when": "inFilesPicker && inQuickOpen"
+  },
+
+  // ctrl + enter is cringe for everything, remove it
+  {
+    "key": "ctrl+enter",
+    "command": "-github.copilot.generate",
+    "when": "editorTextFocus && github.copilot.activated && !inInteractiveInput && !interactiveEditorFocused"
+  },
+  {
+    "key": "ctrl+enter",
+    "command": "-explorer.openToSide",
+    "when": "explorerViewletFocus && foldersViewVisible && !inputFocus"
+  },
+  {
+    "key": "ctrl+enter",
+    "command": "-interactiveEditor.applyEdits",
+    "when": "interactiveEditorHasProvider && interactiveEditorVisible"
+  },
+  {
+    "key": "ctrl+enter",
+    "command": "-editor.action.insertLineAfter",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "ctrl+enter",
+    "command": "-notebook.cell.executeAndFocusContainer",
+    "when": "notebookCellListFocused || editorTextFocus && inputFocus && notebookEditorFocused"
+  },
+  {
+    "key": "ctrl+enter",
+    "command": "-notebook.cell.insertCodeCellBelow",
+    "when": "notebookCellListFocused && !inputFocus"
+  },
+  {
+    "key": "ctrl+enter",
+    "command": "-breadcrumbs.revealFocused",
+    "when": "breadcrumbsActive && breadcrumbsVisible"
+  },
+  {
+    "key": "ctrl+enter",
+    "command": "-breadcrumbs.revealFocusedFromTreeAside",
+    "when": "breadcrumbsActive && breadcrumbsVisible && listFocus && !inputFocus"
+  },
+  {
+    "key": "ctrl+enter",
+    "command": "-debug.openBreakpointToSide",
+    "when": "breakpointsFocused"
+  },
+  {
+    "key": "ctrl+enter",
+    "command": "-interactive.execute",
+    "when": "resourceScheme == 'vscode-interactive'"
+  },
+  {
+    "key": "ctrl+enter",
+    "command": "-explorer.openToSide",
+    "when": "explorerViewletFocus && explorerViewletVisible && !inputFocus"
+  },
+  {
+    "key": "ctrl+enter",
+    "command": "-openReferenceToSide",
+    "when": "listFocus && referenceSearchVisible && !inputFocus && !treeElementCanCollapse && !treeElementCanExpand"
+  },
+  {
+    "key": "ctrl+enter",
+    "command": "-previewSelectedCodeAction",
+    "when": "codeActionMenuVisible"
+  },
+  {
+    "key": "ctrl+enter",
+    "command": "-problems.action.openToSide",
+    "when": "problemFocus"
+  },
+  {
+    "key": "ctrl+enter",
+    "command": "-scm.acceptInput",
+    "when": "scmRepository"
+  },
+  {
+    "key": "ctrl+enter",
+    "command": "-search.action.openResultToSide",
+    "when": "fileMatchOrMatchFocus && searchViewletVisible"
+  },
+  {
+    "key": "ctrl+enter",
+    "command": "-workbench.action.submitComment",
+    "when": "commentEditorFocused"
+  },
+  {
+    "key": "ctrl+enter",
+    "command": "-github.copilot.generate",
+    "when": "editorTextFocus && github.copilot.activated"
+  },
+  {
+    "key": "ctrl+shift+enter",
+    "command": "-editor.action.insertLineBefore",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "ctrl+alt+enter",
+    "command": "-notebook.cell.execute",
+    "when": "notebookCellListFocused && notebookMissingKernelExtension && !notebookCellExecuting && notebookCellType == 'code' || notebookCellListFocused && !notebookCellExecuting && notebookCellType == 'code' && notebookKernelCount > 0 || notebookCellListFocused && !notebookCellExecuting && notebookCellType == 'code' && notebookKernelSourceCount > 0"
+  },
+  {
+    "key": "ctrl+shift+enter",
+    "command": "-notebook.cell.insertCodeCellAbove",
+    "when": "notebookCellListFocused && !inputFocus"
+  },
+  {
+    "key": "ctrl+alt+enter",
+    "command": "-notebook.cell.quitEdit",
+    "when": "inputFocus && notebookEditorFocused && notebookCellType == 'markup'"
+  },
+  {
+    "key": "ctrl+tab",
+    "command": "-workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup",
+    "when": "!activeEditorGroupEmpty"
+  },
+  {
+    "key": "ctrl+tab",
+    "command": "-workbench.action.quickOpenNavigateNextInEditorPicker",
+    "when": "inEditorsPicker && inQuickOpen"
+  },
+  {
+    "key": "ctrl+tab",
+    "command": "editor.cpp.toggle"
+  }
+]
