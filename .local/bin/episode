@@ -1,6 +1,0 @@
-#!/bin/zsh
-
-index=${1:-1} # Default index to 1 if not specified
-folder=${2:-.} # Default folder to current directory if not specified
-
-find "$folder" -maxdepth 1 -type f | sort -d | tail -n +$index | xargs -d '\n' mpv 
