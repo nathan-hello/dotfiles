@@ -1,0 +1,2 @@
+https://archive.org/details/Win11_24H2_English_x64
+https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.240-1/virtio-win-0.1.240.iso
