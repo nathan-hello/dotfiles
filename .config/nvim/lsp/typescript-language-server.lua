@@ -1,4 +1,4 @@
--- npm install -g typescript-lanuage-server typescript
+-- npm install -g typescript-language-server typescript
 
 local M = {
         cmd = { "typescript-language-server", "--stdio" },

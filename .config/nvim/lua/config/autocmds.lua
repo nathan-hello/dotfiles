@@ -28,6 +28,9 @@ vim.api.nvim_command("autocmd VimResized * wincmd =")
 
 
 local override_formatters = {
+        json = function()
+                vim.cmd("silent !cd " .. vim.fn.expand('%:p:h') .. " && prettier --write " .. vim.fn.shellescape(vim.api.nvim_buf_get_name(0))) -- Call prettier binary inside of the directory that I'm in right now (for repo-specific configuration)
+        end,
         astro = function()
                 vim.cmd("silent !cd " .. vim.fn.expand('%:p:h') .. " && prettier --write " .. vim.fn.shellescape(vim.api.nvim_buf_get_name(0))) -- Call prettier binary inside of the directory that I'm in right now (for repo-specific configuration)
         end,
