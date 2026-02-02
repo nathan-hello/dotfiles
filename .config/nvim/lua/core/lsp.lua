@@ -1,13 +1,13 @@
 vim.filetype.add({ extension = { templ = "templ" } })
 
 vim.lsp.enable({
-        "lua_ls",
+        "clangd",
         "gopls",
-        "templ",
+        "htmx",
+        "lua_ls",
         "superhtml",
         "tailwindcss",
-        "clangd",
-        "htmx",
+        "templ",
         "typescript-language-server",
 })
 
@@ -455,14 +455,13 @@ vim.api.nvim_create_user_command('LspStopAll',
 _G.git_branch = safe_git_branch
 _G.lsp_status = safe_lsp_status
 
--- THEN set the statusline
 vim.opt.statusline = table.concat({
-        "%{v:lua.git_branch()}", -- Git branch
+--        "%{v:lua.git_branch()}", -- Git branch
         "%f",                    -- File name
-        "%m",                    -- Modified flag
+--        "%m",                    -- Modified flag
         "%r",                    -- Readonly flag
         "%=",                    -- Right align
-        "%{v:lua.lsp_status()}", -- LSP status
+--        "%{v:lua.lsp_status()}", -- LSP status
         " %l:%c",                -- Line:Column
-        " %p%%"                  -- Percentage through file
+ --       " %p%%"                  -- Percentage through file
 }, " ")

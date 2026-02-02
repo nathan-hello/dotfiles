@@ -1,6 +1,6 @@
 export ZSH="$HOME/.oh-my-zsh"
 export SHELL="/bin/zsh"
-export TERM="ghostty"
+export TERM="st"
 export BROWSER="qutebrowser"
 
 export PATH="$HOME/programs/neovim/bin:$PATH"
@@ -23,14 +23,18 @@ COMPLETION_WAITING_DOTS="true"
 
 # Standard plugins can be found in $ZSH/plugins/
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
-plugins=(git vi-mode)
+plugins=(git)
+
+plugins+=(vi-mode)
 
 function zvm_config() {
   ZVM_LINE_INIT_MODE=$ZVM_MODE_INSERT
 }
+
 plugins+=(zsh-vi-mode)
 
 source $ZSH/oh-my-zsh.sh
+
 
 unsetopt AUTO_CD
 alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles --work-tree=$HOME"
@@ -61,7 +65,7 @@ export ZVM_PATH="$HOME/.config/zvm"
 export ZVM_INSTALL="$ZVM_PATH/bin"
 
 # go
-export GOPATH=$HOME/programs/go
+export GOPATH=$HOME/.local/share/go
 export PATH=$GOPATH/bin:$PATH
 export PATH=$HOME/go/bin:$PATH
 export GVM_ROOT=/home/nate/.gvm # https://github.com/moovweb/gvm
@@ -82,17 +86,20 @@ export LOG="$HOME/.log"
 MAXSIZE=$((50 * 1024 * 1024)) # 50 MB
 
 # Only start logging if not already under script
-if [[ -z "$UNDER_SCRIPT" ]]; then
-  # Rotate if too big
-  if [[ -f $LOG && $(stat -c%s "$LOG") -gt $MAXSIZE ]]; then
-    mv "$LOG" "$LOG.$(date +%Y%m%d%H%M%S)"
-  fi
-
-  export UNDER_SCRIPT=1
-  exec script -q -f "$LOG"
-fi
-
+# if [[ -z "$UNDER_SCRIPT" ]]; then
+#   # Rotate if too big
+#   if [[ -f $LOG && $(stat -c%s "$LOG") -gt $MAXSIZE ]]; then
+#     mv "$LOG" "$LOG.$(date +%Y%m%d%H%M%S)"
+#   fi
+# 
+#   export UNDER_SCRIPT=1
+#   exec script -q -f "$LOG"
+# fi
+# 
 # windows vm
 export fpath=(~/.config/completions/zsh $fpath)
 export PATH="$HOME/.qemu/bin:$PATH"
+
+export DOTNET_ROOT=$HOME/.dotnet
+export PATH=$PATH:$HOME/.dotnet:$HOME/.dotnet/tools
 
