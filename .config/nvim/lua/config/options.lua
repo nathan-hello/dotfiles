@@ -20,7 +20,7 @@ vim.opt.cursorline = true    -- Show which line your cursor is on
 vim.opt.scrolloff = 10       -- Minimal number of screen lines to keep above and below the cursor.
 vim.wo.wrap = false          -- Disable line wrap
 vim.opt.hlsearch = true      -- Set highlight on search
-vim.opt.shiftwidth = 8
+vim.opt.shiftwidth = 2
 vim.opt.expandtab = true
 
 vim.g["vimtex_view_method"] = "zathura"
