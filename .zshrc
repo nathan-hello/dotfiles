@@ -5,6 +5,11 @@ export BROWSER="qutebrowser"
 
 export PATH="$HOME/programs/neovim/bin:$PATH"
 export EDITOR="nvim"
+alias vim="nvim"
+
+alias znvim="nvim $HOME/.zshrc"
+alias nnvim="nvim $HOME/.config/nvim"
+alias snvim='sudo -E XDG_CONFIG_HOME="/home/nate/.config" XDG_DATA_HOME="/home/nate/.local/share" PATH="$PATH" nvim'
 
 ZSH_THEME="pmcgee" # https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 CASE_SENSITIVE="false" # use case-sensitive completion
