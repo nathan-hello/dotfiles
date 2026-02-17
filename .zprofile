@@ -13,14 +13,18 @@ if [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
 
   if [ "$remote_tz" != "$local_tz" ]; then
     echo "Warning: System timezone ($local_tz) differs from IP location ($remote_tz)."
-    echo "[y]: Change timezone to $remote_tz"
+    echo "[y]: Change timezone to $remote_tz (sudo ln -s /usr/share/zoneinfo/$remote_tz /etc/localtime)"
     echo "[n]: Keep timezone as $local_tz"
     echo "[q]: Quit"
     read -k 1 response
     echo
 
     case "$response" in
-      [yY]) sudo unlink /etc/localtime && sudo ln -s /usr/share/zoneinfo/$remote_tz /etc/localtime && startx ;;
+      [yY]) 
+        sudo unlink /etc/localtime 
+        sudo ln -s /usr/share/zoneinfo/$remote_tz /etc/localtime
+        startx 
+        ;;
       [nN]) startx ;;
       [qQ]) exit 1 ;;
     esac
