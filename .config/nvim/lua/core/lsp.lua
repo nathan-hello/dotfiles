@@ -1,15 +1,17 @@
 vim.filetype.add({ extension = { templ = "templ" } })
 
-vim.lsp.enable({
-        "clangd",
-        "gopls",
-        "htmx",
-        "lua_ls",
-        "superhtml",
-        "tailwindcss",
-        "templ",
-        "typescript-language-server",
-})
+vim.lsp.enable({ "clangd",
+    "css",
+    "eslint",
+    "go",
+    "html",
+    "json",
+    "lua",
+    "tailwindcss",
+    "templ",
+    "typescript",
+    "zig",
+  })
 
 local capabilities = vim.tbl_deep_extend(
         "force",
