@@ -18,7 +18,16 @@ local capabilities = vim.tbl_deep_extend(
         {},
         vim.lsp.protocol.make_client_capabilities(),
         require('cmp_nvim_lsp').default_capabilities(),
-        { fileOperations = { didRename = true, willRename = true, }, }
+        {
+                fileOperations = { didRename = true, willRename = true, },
+                textDocument = {
+                        completion = {
+                                completionItem = {
+                                        snippetSupport = false,
+                                },
+                        },
+                },
+        }
 )
 
 vim.lsp.config("*", {
