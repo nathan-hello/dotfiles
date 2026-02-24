@@ -1,9 +1,8 @@
 if [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
   local geoip=$(curl -s https://geoip.reluekiss.com)
   
-  if [ $? -ne 0 ]; then
-    echo "Could not verify timezone because no internet connection. Press any key to continue."
-    read -k 1
+  if [ $? -ne 0 ] || [ -z "$geoip" ]; then
+    echo "No internet or API error. Starting X..."
     exec startx
   fi
 

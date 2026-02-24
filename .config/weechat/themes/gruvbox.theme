@@ -1,0 +1,9 @@
+[theme]
+weechat.bar.status.color_bg = 237
+weechat.bar.title.color_bg = 237
+weechat.bar.status.color_fg = 223
+weechat.bar.title.color_fg = 223
+weechat.color.chat_nick_self = 208
+weechat.color.chat_highlight = 214
+weechat.color.chat_time = 243
+weechat.color.status_name = 142
