@@ -60,7 +60,7 @@ local function build_harpoon_lines(width)
     return {}
   end
 
-  local keys = {"1", "2", "3", "4", "q", "w", "e", "r"}
+  local keys = {"1", "2", "3", "4", "!", "@", "#", "$"}
 
   local slots = 8
   local items = harpoon:list().items or {}
