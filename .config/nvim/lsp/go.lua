@@ -16,6 +16,7 @@ local M = {
         unusedparams = true,
         ST1000 = false,
         ST1003 = false,
+        ST1020 = false,
       },
       hints = {
         assignVariableTypes = true,
