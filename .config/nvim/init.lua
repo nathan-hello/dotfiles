@@ -9,3 +9,4 @@ require("config.keymaps")
 require("config.autocmds")
 
 require("core.lsp")
+require("config.utils")
