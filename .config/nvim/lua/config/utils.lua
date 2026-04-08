@@ -60,7 +60,7 @@ local function build_harpoon_lines(width)
     return {}
   end
 
-  local keys = {"1", "2", "3", "4", "!", "@", "#", "$"}
+  local keys = {"c1", "c2", "c3", "c4", "f1", "f2", "f3", "f4"}
 
   local slots = 8
   local items = harpoon:list().items or {}
@@ -89,7 +89,7 @@ local function build_harpoon_lines(width)
       marker = "&"
     end
 
-    local content = string.format("%s%s %s", keys[i], marker, format_harpoon_path(path, width - 3))
+    local content = string.format("%s%s %s", keys[i], marker, format_harpoon_path(path, width - 4))
     lines[i] = pad_right(content, width)
   end
 
@@ -177,3 +177,5 @@ vim.api.nvim_create_autocmd({ "VimEnter", "VimResized", "WinResized", "FocusGain
     render_overlay()
   end,
 })
+
+return {}
