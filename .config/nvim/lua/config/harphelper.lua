@@ -101,6 +101,25 @@ local overlay = {
   win = nil,
 }
 
+local function nvimtree_is_visible()
+  for _, winid in ipairs(vim.api.nvim_list_wins()) do
+    local buf = vim.api.nvim_win_get_buf(winid)
+    if vim.bo[buf].filetype == "NvimTree" then
+      return true
+    end
+  end
+
+  return false
+end
+
+local function close_overlay()
+  if overlay.win and vim.api.nvim_win_is_valid(overlay.win) then
+    pcall(vim.api.nvim_win_close, overlay.win, true)
+  end
+
+  overlay.win = nil
+end
+
 local function ensure_overlay_buf()
   if overlay.buf and vim.api.nvim_buf_is_valid(overlay.buf) then
     return overlay.buf
@@ -155,6 +174,11 @@ local function ensure_overlay()
 end
 
 local function render_overlay()
+  if not nvimtree_is_visible() then
+    close_overlay()
+    return
+  end
+
   local _, buf = ensure_overlay()
   if not buf then
     return
@@ -168,13 +192,21 @@ local function render_overlay()
   vim.bo[buf].modifiable = false
 end
 
-function _G.refresh_harpoon_bar()
-  vim.schedule(render_overlay)
+local function sync_overlay()
+  if nvimtree_is_visible() then
+    render_overlay()
+  else
+    close_overlay()
+  end
 end
 
-vim.api.nvim_create_autocmd({ "VimEnter", "VimResized", "WinResized", "FocusGained", "BufEnter", "WinEnter", "BufWinEnter" }, {
+function _G.refresh_harpoon_bar()
+  vim.schedule(sync_overlay)
+end
+
+vim.api.nvim_create_autocmd({ "VimEnter", "VimResized", "WinResized", "FocusGained", "BufEnter", "WinEnter", "BufWinEnter", "WinClosed", "BufWinLeave" }, {
   callback = function()
-    render_overlay()
+    sync_overlay()
   end,
 })
 
