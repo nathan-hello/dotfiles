@@ -21,6 +21,9 @@ CORES="8"
 
 # 1. Setup TPM
 mkdir -p "$TPM_DIR"
+# Clear stale TPM state from a previous crash or aborted launch.
+pkill -f "swtpm socket --tpm2 --tpmstate dir=$TPM_DIR" 2>/dev/null || true
+rm -f "$TPM_DIR"/swtpm-sock "$TPM_DIR"/lockfile "$TPM_DIR"/*.lock 2>/dev/null || true
 swtpm socket --tpm2 --tpmstate dir="$TPM_DIR" \
     --ctrl type=unixio,path="$TPM_DIR/swtpm-sock" &
 SWTPM_PID=$!
@@ -35,11 +38,19 @@ args=(
   -name "windows"
   -enable-kvm
   -machine type=q35,smm=on,accel=kvm,usb=on
-  -cpu host,hv_relaxed,hv_spinlocks=0x1fff,hv_vapic,hv_time,hv_frequencies,hv_stimer,hv_synic,hv_reset,hv_vpindex,hv_runtime,host-cache-info=on,l3-cache=on
+
+  -object iothread,id=io1
+
+  -cpu host,topoext,hv_relaxed,hv_spinlocks=0x1fff,hv_vapic,hv_time,hv_frequencies,hv_stimer,hv_synic,hv_reset,hv_vpindex,hv_runtime,hv_tlbflush,hv_ipi,host-cache-info=on,l3-cache=on
   -smp "$CORES",sockets=1,dies=1,cores="$CORES",threads=1 
-  -m "$MEMORY"
+
+  -object memory-backend-memfd,id=mem1,size="$MEMORY",share=on
+  -machine memory-backend=mem1
+
+
   -qmp tcp:127.0.0.1:4444,server,nowait
-  -device usb-tablet
+  -device qemu-xhci,id=xhci
+  -device usb-tablet,bus=xhci.0
   # -boot menu=on,splash-time=1000
 
   # Secure Boot
@@ -52,8 +63,8 @@ args=(
   -tpmdev emulator,id=tpm0,chardev=chrtpm
   -device tpm-tis,tpmdev=tpm0
 
-  # Storage
-  -device virtio-scsi-pci,id=scsi0
+  # Storage. iothread,num_queues is dependent on -object above
+  -device virtio-scsi-pci,id=scsi0,iothread=io1,num_queues=4
   -drive file="$DISK_PATH",format=raw,if=none,id=drive0,cache=none,aio=native,discard=unmap
   -device scsi-hd,drive=drive0,bus=scsi0.0
 
@@ -76,21 +87,10 @@ args=(
   # Disable default legacy graphics card to prevent "Ghost Monitor"
   -vga none 
 
-  # Display - QXL
-  # We use QXL because the QXL WDDM driver handles dynamic
-  # resolution changes much better than the VirtIO DOD driver.
-  -device qxl-vga,ram_size_mb=128,vgamem_mb=64
-  -display gtk,gl=off,grab-on-hover=on,zoom-to-fit=off
-  -spice port=5900,addr=127.0.0.1,disable-ticketing=on
-  -device virtio-serial-pci
-  -device virtserialport,chardev=spicechannel0,name=com.redhat.spice.0
-  -chardev spicevmc,id=spicechannel0,name=vdagent
-
-  # Display - Virtio
-  # Unused because when it is used there are no resolution options in Windows. 
-  # As in, there is no way to change the resolution manually ever at all.
-  # -device virtio-gpu-pci
-  # -display gtk,gl=off,grab-on-hover=on
+  # Display - VirtIO GL
+  # Lower-latency local display path than QXL/SPICE.
+  -device virtio-vga-gl
+  -display gtk,gl=on,grab-on-hover=on,zoom-to-fit=off
 )
 
 qemu-system-x86_64 "${args[@]}"
@@ -150,4 +150,3 @@ qemu-system-x86_64 "${args[@]}"
 #   -netdev user,id=net0
 #   -device virtio-net-pci,netdev=net0,mac=52:54:00:00:00:01
 # )
-
