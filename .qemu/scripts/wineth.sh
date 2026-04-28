@@ -23,14 +23,19 @@ BRIDGE="win-br$SLOT"
 if [ "$MODE" == "detach" ]; then
     echo "Disconnecting $IFACE from $BRIDGE..."
 
-    # Move IP back from bridge to the physical interface
+    # Move all IPv4 addresses back from the bridge to the physical interface
     ADDR_INFO=$(ip -4 addr show "$BRIDGE" | grep -oP 'inet \K\S+')
     ip link set "$IFACE" nomaster
     ip addr flush dev "$BRIDGE"
 
     if [ -n "$ADDR_INFO" ]; then
-        ip addr add "$ADDR_INFO" dev "$IFACE"
-        echo "Moved $ADDR_INFO back to $IFACE."
+        while IFS= read -r addr; do
+            [ -n "$addr" ] || continue
+            ip addr add "$addr" dev "$IFACE"
+        done <<EOF
+$ADDR_INFO
+EOF
+        echo "Moved IPv4 addresses back to $IFACE."
     fi
 
     echo "Done."
@@ -46,13 +51,18 @@ elif [ "$MODE" == "attach" ]; then
     ADDR_INFO=$(ip -4 addr show "$IFACE" | grep -oP 'inet \K\S+')
 
     # Flush IP from the physical interface and add it to the bridge
-    ip addr flush dev "$IFACE"
     ip link set "$IFACE" master "$BRIDGE"
     ip link set "$IFACE" up
 
     if [ -n "$ADDR_INFO" ]; then
-        ip addr add "$ADDR_INFO" dev "$BRIDGE"
-        echo "Moved $ADDR_INFO from $IFACE to $BRIDGE."
+        ip addr flush dev "$IFACE"
+        while IFS= read -r addr; do
+            [ -n "$addr" ] || continue
+            ip addr add "$addr" dev "$BRIDGE"
+        done <<EOF
+$ADDR_INFO
+EOF
+        echo "Moved IPv4 addresses from $IFACE to $BRIDGE."
     else
         echo "No IPv4 address found on $IFACE; bridge has no IPv4."
     fi

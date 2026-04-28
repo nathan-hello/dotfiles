@@ -90,7 +90,7 @@ args=(
   # Display - VirtIO GL
   # Lower-latency local display path than QXL/SPICE.
   -device virtio-vga-gl
-  -display gtk,gl=on,grab-on-hover=on,zoom-to-fit=off
+  -display sdl,gl=on
 )
 
 qemu-system-x86_64 "${args[@]}"
