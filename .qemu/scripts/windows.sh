@@ -91,6 +91,13 @@ args=(
   # Lower-latency local display path than QXL/SPICE.
   -device virtio-vga-gl
   -display sdl,gl=on
+  # Enable below after Framework16 w/ Ryzen HX 370 stops shitting the
+  # bed with certain gui applications. My suspicion is that it is related
+  # to GTK/qt. 
+  # When this is used, Windows understands that the resolution of the X11 window
+  # is a viable resolution that it can render at. Very nice. But it crashes randomly because GTK?
+  # On FW16 with my dwm config, the resolution that it resolves to is 2540x1552 and it looks great.
+  # -display gtk,gl=on,zoom-to-fit=on,keep-aspect-ratio=off,show-menubar=off,show-tabs=off
 )
 
 qemu-system-x86_64 "${args[@]}"
