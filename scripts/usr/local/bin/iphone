@@ -1,0 +1,34 @@
+#!/bin/sh
+# iphone-tool.sh
+
+MOUNTPOINT="$HOME/self/iphone"
+APPID="org.videolan.vlc-ios"
+
+case "$1" in
+    m|mount)
+        mkdir -p "$MOUNTPOINT"
+        # Check if paired
+        if ! idevicepair pair >/dev/null 2>&1; then
+            echo "Error: Ensure iPhone is plugged in and you tapped 'Trust'."
+            exit 1
+        fi
+        # Mount the specific app container
+        if ifuse --documents "$APPID" "$MOUNTPOINT"; then
+            echo "Mounted iPhone ($APPID) to $MOUNTPOINT"
+        else
+            echo "Mount failed. Try absolute paths or check usbmuxd service."
+        fi
+        ;;
+    u|unmount)
+        if fusermount -u "$MOUNTPOINT"; then
+            echo "Unmounted $MOUNTPOINT"
+            rmdir "$MOUNTPOINT"
+        else
+            echo "Unmount failed. Is the directory busy?"
+        fi
+        ;;
+    *)
+        echo "Usage: $0 [mount|unmount]"
+        exit 1
+        ;;
+esac

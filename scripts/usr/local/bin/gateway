@@ -1,0 +1,35 @@
+#!/bin/bash
+
+if [ -z "$1" ]; then
+    echo "Usage: gateway <interface_name>"
+    echo "Example: gateway wlp191s0"
+    echo ""
+    echo "Current Interfaces:"
+    nmcli device status
+    exit 1
+fi
+
+TARGET_IFACE=$1
+
+# 1. Get a list of all managed ethernet/wifi interfaces
+INTERFACES=$(nmcli -t -f DEVICE device | grep -v "lo")
+
+echo "Setting $TARGET_IFACE as the primary gateway..."
+
+for IFACE in $INTERFACES; do
+    if [ "$IFACE" = "$TARGET_IFACE" ]; then
+        # Set the target to be the default
+        nmcli device modify "$IFACE" ipv4.never-default no 2>/dev/null
+        # Set a low route metric (high priority)
+        nmcli device modify "$IFACE" ipv4.route-metric 50 2>/dev/null
+        echo " [+] $IFACE: Priority set to HIGH (Default)"
+    else
+        # Set all other interfaces to NEVER be the default
+        nmcli device modify "$IFACE" ipv4.never-default yes 2>/dev/null
+        # Set a high route metric (low priority)
+        nmcli device modify "$IFACE" ipv4.route-metric 1000 2>/dev/null
+        echo " [-] $IFACE: Priority set to LOW (Never-Default)"
+    fi
+done
+
+echo "Done. Routing table updated for this session."

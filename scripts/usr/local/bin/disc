@@ -1,0 +1,59 @@
+#!/bin/sh
+
+set -eu
+
+MNT=/mnt/disc
+
+need() {
+    if command -v "$1" >/dev/null 2>&1; then
+        return
+    fi
+    echo "missing: $1" >&2
+    echo "install: sudo xbps-install -S $2" >&2
+    exit 1
+}
+
+[ $# -eq 2 ] || {
+    echo "usage: $0 {format|mount|done} /dev/sr0" >&2
+    exit 1
+}
+
+CMD=$1
+DEV=$2
+
+case "$CMD" in
+    format)
+        need dvd+rw-format dvd+rw-tools
+        need mkudffs udftools
+        need umount util-linux
+
+        sudo umount "$MNT" 2>/dev/null || true
+        sudo umount "$DEV" 2>/dev/null || true
+        sudo dvd+rw-format -force "$DEV"
+        sudo mkudffs --media-type=dvdrw "$DEV"
+        ;;
+
+    mount)
+        need mount util-linux
+
+        sudo mkdir -p "$MNT"
+        sudo mount \
+            -t udf \
+            -o rw,noatime,uid=$(id -u),gid=$(id -g) \
+            "$DEV" "$MNT"
+        ;;
+
+    done)
+        need umount util-linux
+        need eject util-linux
+
+        cd /
+        sudo umount -l "$MNT" 2>/dev/null || true
+        sudo eject "$DEV"
+        ;;
+
+    *)
+        echo "usage: $0 {format|mount|done} /dev/sr0" >&2
+        exit 1
+        ;;
+esac

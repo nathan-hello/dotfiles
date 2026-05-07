@@ -1,0 +1,3 @@
+#!/bin/sh
+
+qutebrowser http://localhost:631

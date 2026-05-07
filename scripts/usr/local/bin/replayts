@@ -1,0 +1,34 @@
+#!/bin/sh
+set -eu
+
+: "${ZSH_SESSION_LOG_DIR:?ZSH_SESSION_LOG_DIR is not set}"
+
+if [ $# -ne 1 ]; then
+	printf 'usage: %s SESSION_DIR\n' "${0##*/}" >&2
+	exit 1
+fi
+
+case $1 in
+	/*) session_dir=$1 ;;
+	*) session_dir=$ZSH_SESSION_LOG_DIR/$1 ;;
+esac
+
+timing=$session_dir/timing
+typescript=$session_dir/typescript
+
+if [ ! -d "$session_dir" ]; then
+	printf '%s: not a session directory: %s\n' "${0##*/}" "$session_dir" >&2
+	exit 1
+fi
+
+if [ ! -r "$timing" ]; then
+	printf '%s: cannot read %s\n' "${0##*/}" "$timing" >&2
+	exit 1
+fi
+
+if [ ! -r "$typescript" ]; then
+	printf '%s: cannot read %s\n' "${0##*/}" "$typescript" >&2
+	exit 1
+fi
+
+exec scriptreplay "$timing" "$typescript"

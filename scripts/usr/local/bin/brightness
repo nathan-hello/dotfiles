@@ -1,0 +1,36 @@
+#!/bin/sh
+
+BACKLIGHT_DIR="/sys/class/backlight"
+folders=$(ls -1 "$BACKLIGHT_DIR" 2>/dev/null)
+count=$(echo "$folders" | wc -l)
+
+if [ -z "$folders" ]; then
+    echo "No backlight devices found"
+    exit 1
+fi
+
+if [ "$count" -eq 1 ]; then
+    DEVICE="$folders"
+    BRIGHTNESS=$1
+else
+    if [ -z "$1" ]; then
+        echo "Multiple backlight devices found:"
+        echo "$folders" | sed 's/^/  /'
+        echo "Usage: $0 <device> [brightness]"
+        exit 1
+    fi
+    DEVICE="$1"
+    BRIGHTNESS=$2
+fi
+
+MAX_BRIGHTNESS=$(cat "$BACKLIGHT_DIR/$DEVICE/max_brightness")
+CUR_BRIGHTNESS=$(cat "$BACKLIGHT_DIR/$DEVICE/brightness")
+
+if [ -z "$BRIGHTNESS" ]; then
+    echo "$(echo "scale=2; $CUR_BRIGHTNESS/$MAX_BRIGHTNESS" | bc -lq )"
+    # echo "$CUR_BRIGHTNESS / $MAX_BRIGHTNESS"
+    exit 0
+fi
+
+VALUE=$((BRIGHTNESS * MAX_BRIGHTNESS / 100))
+echo $VALUE | sudo tee "$BACKLIGHT_DIR/$DEVICE/brightness" > /dev/null

@@ -1,0 +1,26 @@
+#!/bin/sh
+
+index=1
+folder="."
+shuffle=false
+mpv_args=""
+
+# Parse flags
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -s) mpv_args="$mpv_args --no-video" ;;
+        -r) shuffle=true ;;
+        [0-9]*) index="$1" ;;
+        -*) ;; # Ignore unknown flags
+        *) folder="$1" ;; # Assume last non-flag is the folder
+    esac
+    shift
+done
+
+if [ "$shuffle" = true ]; then
+    find -L "$folder" -mindepth 1 -maxdepth 4 -type f | shuf | \
+        xargs -d '\n' mpv $mpv_args
+else
+    find -L "$folder" -mindepth 1 -maxdepth 1 -type f | sort -d | \
+        tail -n +"$index" | xargs -d '\n' mpv $mpv_args
+fi

@@ -1,0 +1,2 @@
+#!/bin/sh
+helium --basedir ~/.cache/spotify-qutebrowser --set tabs.tabs_are_windows true https://open.spotify.com/

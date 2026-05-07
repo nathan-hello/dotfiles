@@ -1,0 +1,3 @@
+#!/bin/sh
+
+prismlauncher -l latest

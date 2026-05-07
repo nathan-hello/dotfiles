@@ -1,0 +1,70 @@
+#!/bin/sh
+
+# Usage: ./rename.sh [--mv] [--hide-artist-name] files...
+COMMIT=0
+HIDE_ARTIST=0
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --mv) COMMIT=1; shift ;;
+        --hide-artist-name) HIDE_ARTIST=1; shift ;;
+        -*) shift ;; 
+        *) break ;; 
+    esac
+done
+
+for f in "$@"; do
+    # Only process flac files as the metadata source
+    [ -f "$f" ] && [ "${f##*.}" = "flac" ] || [ "${f##*.}" = "mp3" ] || continue
+
+    artist="" album="" track="" tracknumber="" title=""
+
+    # 1. Extract Metadata from FLAC
+    eval "$(ffprobe -v error -show_entries format_tags=artist,album,track,tracknumber,title -of default=noprint_wrappers=1 "$f" | while read -r line; do
+        key=$(echo "$line" | cut -d= -f1 | sed 's/^TAG://' | tr '[:upper:]' '[:lower:]')
+        val=$(echo "$line" | cut -d= -f2-)
+        printf '%s="%s"\n' "$key" "$val"
+    done)"
+
+    # 2. Normalize Track and Components
+    raw_num="${track:-$tracknumber}"
+    num=$(echo "$raw_num" | cut -d/ -f1)
+    [ -n "$num" ] && num=$(printf "%02d" "$num" 2>/dev/null || echo "$num")
+
+    [ "$HIDE_ARTIST" -eq 1 ] && artist=""
+    
+    prefix=""
+    [ -n "$num" ] && prefix="($num) "
+
+    name_base="${title:-$(basename "$f" .flac)}"
+
+    dir_part=""
+    if [ -n "$artist" ] && [ -n "$album" ]; then
+        dir_part="$artist - $album"
+    else
+        dir_part="${artist}${album}"
+    fi
+
+    # 3. Construct the shared Base Destination
+    if [ -n "$dir_part" ]; then
+        dest_base="${dir_part} - ${prefix}${name_base}"
+    else
+        dest_base="${prefix}${name_base}"
+    fi
+
+    # 4. Handle all associated file types
+    # Finds files with same name but different extensions (.flac, .jpg, .lrc)
+    base_path="${f%.*}"
+    for ext in flac jpg lrc; do
+        target_src="${base_path}.${ext}"
+        target_dest="${dest_base}.${ext}"
+
+        if [ -f "$target_src" ]; then
+            if [ "$COMMIT" -eq 1 ]; then
+                mv -v "$target_src" "$target_dest"
+            else
+                printf 'DRY-RUN: "%s" -> "%s"\n' "$target_src" "$target_dest"
+            fi
+        fi
+    done
+done
