@@ -1,0 +1,17 @@
+#compdef replayts
+
+_replayts() {
+	local dir=${ZSH_SESSION_LOG_DIR:-}
+	local -a sessions
+	local d
+
+	[[ -n $dir && -d $dir ]] || return 0
+
+	sessions=()
+	for d in "$dir"/*(/N); do
+		[[ -r "$d/timing" && -r "$d/typescript" ]] || continue
+		sessions+=("${d:t}")
+	done
+
+	compadd -Q -- $sessions
+}

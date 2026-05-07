@@ -1,0 +1,12 @@
+#compdef wineth
+
+_wineth() {
+    local -a interfaces
+    interfaces=(${(f)"$(nmcli -t -f DEVICE device | grep -vE '^(lo|DEVICE)$')"})
+    _describe 'interface' interfaces
+}
+
+_arguments \
+    '1:mode:(1 2)' \
+    ':interface:_wineth' \
+    '::action:(attach detach)'

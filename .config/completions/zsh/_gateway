@@ -1,0 +1,11 @@
+#compdef gateway
+
+_gateway() {
+    local -a interfaces
+    # (f) splits the output by lines
+    interfaces=(${(f)"$(nmcli -t -f DEVICE device | grep -vE 'lo|DEVICE')"})
+    
+    _describe 'interface' interfaces
+}
+
+_gateway "$@"
