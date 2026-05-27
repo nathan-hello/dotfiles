@@ -7,6 +7,10 @@ require("config.options")
 require("core.lazy")
 require("config.keymaps")
 require("config.autocmds")
+require("config.asm")
 
 require("core.lsp")
-require("config.harphelper")
+
+if vim.loop.getuid() ~= 0 then
+  require("config.harphelper")
+end

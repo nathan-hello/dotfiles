@@ -5,9 +5,12 @@ local M = {
   },
   opts = {
     view = { side = "right" },
+    filters = {
+      custom = { "node_modules" },
+    },
     git = {
       enable = false,
-    }
+    },
   },
 }
 

@@ -6,7 +6,7 @@ local M = {
                 --  va)  - [V]isually select [A]round [)]paren
                 --  yinq - [Y]ank [I]nside [N]ext [']quote
                 --  ci'  - [C]hange [I]nside [']quote
-                require("mini.ai").setup({ n_lines = 500 })
+                -- require("mini.ai").setup({ n_lines = 500 })
 
                 -- seems cool but disabled because it changes default behavior of 's' by itself - me 05apr2024
                 -- Add/delete/replace surroundings (brackets, quotes, etc.)

@@ -1,6 +1,7 @@
 vim.filetype.add({ extension = { templ = "templ" } })
 
 vim.lsp.enable({ "clangd",
+  "python",
   "css",
   "eslint",
   "go",

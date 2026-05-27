@@ -1,4 +1,21 @@
-require("harpoon"):setup({})
+if vim.loop.getuid() ~= 0 then
+  local harpoon_root = vim.loop.fs_realpath(vim.fn.getcwd()) or vim.fn.getcwd()
+
+  require("harpoon"):setup({
+    settings = {
+      key = function()
+        local git_dir = vim.fs.find(".git", { upward = true, path = harpoon_root })[1]
+        if git_dir then
+          return vim.loop.fs_realpath(vim.fs.dirname(git_dir)) or vim.fs.dirname(git_dir)
+        end
+
+        return harpoon_root
+      end,
+      save_on_toggle = true,
+      sync_on_ui_close = true,
+    },
+  })
+end
 
 
 

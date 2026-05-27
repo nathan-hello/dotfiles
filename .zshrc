@@ -1,17 +1,15 @@
+source $HOME/.zshlog.zsh
+
 export ZSH="$HOME/.oh-my-zsh"
 export SHELL="/bin/zsh"
 export TERM="st"
-export BROWSER="qutebrowser"
+export BROWSER="helum"
+
 
 export PATH="$HOME/programs/neovim/bin:$PATH"
 export EDITOR="nvim"
-alias vim="nvim"
 
-alias znvim="nvim $HOME/.zshrc"
-alias nnvim="nvim $HOME/.config/nvim"
-alias snvim='sudo -E XDG_CONFIG_HOME="/home/nate/.config" XDG_DATA_HOME="/home/nate/.local/share" PATH="$PATH" nvim'
-
-ZSH_THEME="pmcgee" # https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
+ZSH_THEME="pmcgee-notime" # https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 CASE_SENSITIVE="false" # use case-sensitive completion
 HYPHEN_INSENSITIVE="true" # use hyphen-insensitive completion
 zstyle ':omz:update' mode disabled  # update mode: disabled | auto | reminder
@@ -26,27 +24,27 @@ DISABLE_MAGIC_FUNCTIONS="true" # Uncomment the following line if pasting URLs an
 # Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
 COMPLETION_WAITING_DOTS="true"
 
-# Standard plugins can be found in $ZSH/plugins/
-# Custom plugins may be added to $ZSH_CUSTOM/plugins/
-plugins=(git)
-
+VI_MODE_SET_CURSOR=true
 plugins+=(vi-mode)
 
-function zvm_config() {
-  ZVM_LINE_INIT_MODE=$ZVM_MODE_INSERT
-}
-
-plugins+=(zsh-vi-mode)
-
+# completion path edit go before oh-my-zsh
+export fpath=($HOME/.config/completions/zsh $fpath)
 source $ZSH/oh-my-zsh.sh
-
-
 unsetopt AUTO_CD
-alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles --work-tree=$HOME"
+
+alias vim="nvim"
+alias znvim="nvim $HOME/.zshrc"
+alias nnvim="cd $HOME/.config/nvim && nvim ."
+alias snvim='sudo -E XDG_CONFIG_HOME="/home/nate/.config" XDG_DATA_HOME="/home/nate/.local/share" PATH="$PATH" nvim'
+
+alias gs="git status"
+
 alias rm="rm -rv"
+alias mv="mv -i"
+
 alias ls="exa -lh --header --group-directories-first --sort Name"
 alias la="exa -lah --header --group-directories-first --sort Name"
-alias flogout="pkill -KILL -u $(whoami)"
+alias flogout="pkill -HUP -u $(whoami)"
 
 alias toby="sudo mount -t nfs 192.168.1.6:/mnt /mnt/toby && cd /mnt/toby"
 
@@ -60,10 +58,12 @@ export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/opt/cuda/cuda12.2.2/include
 export C_INCLUDE_PATH=$C_INCLUDE_PATH:/opt/cuda/cuda12.2.2/include
 alias nvcc="nvcc -ccbin /opt/gcc/build/gcc-12.3/bin/gcc"
 
-# bun
+# javascript
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 [ -s "/home/nate/.bun/_bun" ] && source "/home/nate/.bun/_bun" # bun completions
+
+export PATH="~/.local/share/pnpm/bin:$PATH"
 
 # zig
 export ZVM_PATH="$HOME/.config/zvm"
@@ -86,6 +86,7 @@ export PATH="/home/nate/.turso:$PATH"
 export PATH="/snap/bin:$PATH"
 
 bindkey '^H' backward-delete-word
+bindkey '^[^?' backward-delete-word
 
 export LOG="$HOME/.log"
 MAXSIZE=$((50 * 1024 * 1024)) # 50 MB
@@ -101,10 +102,11 @@ MAXSIZE=$((50 * 1024 * 1024)) # 50 MB
 #   exec script -q -f "$LOG"
 # fi
 # 
-# windows vm
-export fpath=(~/.config/completions/zsh $fpath)
 export PATH="$HOME/.qemu/bin:$PATH"
 
 export DOTNET_ROOT=$HOME/.dotnet
 export PATH=$PATH:$HOME/.dotnet:$HOME/.dotnet/tools
 
+
+# opencode
+export PATH=/home/nate/.opencode/bin:$PATH

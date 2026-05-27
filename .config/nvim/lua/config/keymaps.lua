@@ -34,11 +34,16 @@ vim.keymap.set("n", "<leader>j", "<cmd>lprev<CR>zz", { desc = "Previous entry in
 vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]],
   { desc = "Find and replace word on hover" })
 
+-- This works because of this in st/config.h
+-- { XK_BackSpace,     ControlMask,    "\033\177",      0,    0 },
+vim.keymap.set("i", "<M-BS>", "<C-w>", { noremap = true, silent = true })
+
 
 vim.keymap.set("n", "[c", function() require("treesitter-context").go_to_context(vim.v.count1) end, { silent = true })
 
 local harpoon = require("harpoon")
 local switcher = require("config.switcher")
+local asm = require("config.asm")
 local function refresh_harpoon_bar()
   if _G.refresh_harpoon_bar then
     _G.refresh_harpoon_bar()
